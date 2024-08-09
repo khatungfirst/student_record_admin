@@ -6,7 +6,6 @@ const user = {
   state: {
     token: '',
     name: '',
-    roles: [],
     userInfo: {}
   },
 
@@ -23,27 +22,21 @@ const user = {
     },
     SET_USERINFO: (state, userinfo) => {
       state.userInfo = userinfo
-      localStorage.setItem('userInfo', userinfo);//将用户信息存到本地
+      localStorage.setItem('userInfo', JSON.stringify(userinfo));//将用户信息存到本地
     }
   },
 
   actions: {
     // 将token存入
     tokenIn(store,context) {
+      console.log("111111111",context)
       store.commit('SET_TOKEN', context)
     },
-    // 获取用户信息
-    GetInfo({ commit, state }) {
-      return new Promise((resolve, reject) => {
-        getInfo(state.token).then(response => {
-          const data = response.data
-          commit('SET_ROLES', data.roles)
-          commit('SET_NAME', data.name)
-          resolve(response)
-        }).catch(error => {
-          reject(error)
-        })
-      })
+
+    //将登录用户的身份和username存入
+    userInfo(store,context){
+      console.log(context,'conetxt');
+      store.commit('SET_USERINFO',context)
     },
 
     // 登出
@@ -53,15 +46,12 @@ const user = {
       localStorage.removeItem('token')
     },
 
-    // 前端 登出
-    FedLogOut({ commit }) {
-      return new Promise(resolve => {
-        commit('SET_TOKEN', '')
-        removeToken()
-        resolve()
-      })
-    }
-  }
+  },
+
+  getters: {  
+    // 定义一个 getter 来获取用户的角色  
+    roles: state => state.userInfo.roles  
+  }  
 }
 
 export default user

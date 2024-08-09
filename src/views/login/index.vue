@@ -118,23 +118,24 @@ export default {
       if (this.loginForm.verify === null) {
         Message("验证码不能为空！");
       }
-      console.log(this.loginForm.right_verify, "???");
+      // console.log(this.loginForm.right_verify, "???");
       //判断验证码是否正确
       if (this.loginForm.verify === this.loginForm.right_verify) {
+        console.log('111111');
         const data = await login(
           this.loginForm.username,
           this.loginForm.password,
           this.loginForm.verify,
           this.loginForm.verify_id
         );
-
-        this.$store.commit("user/SET_USERINFO", data.data);
+        console.log(data,'22222');
         const code = data.code;
-        console.log(data.data,'code');
-        if (code === '200') {
-          console.log('11111111');
-          this.$store.dispatch("user/tokenIn", code); //把token存到vuex中
-          this.$router.push('/layout')
+        console.log(data.code,'code');
+        if (code === 200) {
+          console.log('000000');
+          this.$store.dispatch("user/userInfo", data.data);
+          this.$store.dispatch("user/tokenIn", data.data.token); //把token存到vuex中
+          this.$router.push('/layout')  
         }
       } else {
         Message("验证码输入错误，请重新输入！");
@@ -146,29 +147,29 @@ export default {
         const codeData = await getPicCode();
         console.log(codeData, "data"); // 检查后端响应
 
-        if (codeData.code === '200') {
-          this.loginForm.base_code = codeData.data.b_64; // 获取 base64 编码
-          this.loginForm.verify_id = codeData.data.id; // 获取验证码的 ID
-          this.loginForm.right_verify = codeData.data.hcode; // 获取正确的验证码
-          // console.log(this.loginForm.right_verify, "verify");
+        if (codeData.code === 200) {
+          this.loginForm.base_code = codeData.data.B64; // 获取 base64 编码
+          this.loginForm.verify_id = codeData.data.Id; // 获取验证码的 ID
+          this.loginForm.right_verify = codeData.data.Hcode; // 获取正确的验证码
+          console.log(this.loginForm.right_verify, "verify");
 
-          // // 处理 Data URI
-          // const base64String = this.loginForm.base_code.split(",")[1];
-          // console.log(this.loginForm.base_code,'111');
-          // if (!base64String) {
-          //   throw new Error("Invalid base64 string in Data URI");
-          // }
+          // 处理 Data URI
+          const base64String = this.loginForm.base_code.split(",")[1];
+          console.log(this.loginForm.base_code,'111');
+          if (!base64String) {
+            throw new Error("Invalid base64 string in Data URI");
+          }
 
-          // const blob = this.convertBase64ToBlob(base64String);
-          // const imageUrl = URL.createObjectURL(blob);
+          const blob = this.convertBase64ToBlob(base64String);
+          const imageUrl = URL.createObjectURL(blob);
 
-          // // 假设 img 元素已经在 HTML 中
-          // const img = document.querySelector("img");
-          // if (img) {
-          //   img.src = imageUrl;
-          // } else {
-          //   console.error("Image element not found");
-          // }
+          // 假设 img 元素已经在 HTML 中
+          const img = document.querySelector("img");
+          if (img) {
+            img.src = imageUrl;
+          } else {
+            console.error("Image element not found");
+          }
         } else {
           console.error("Failed to fetch picture code", codeData);
         }

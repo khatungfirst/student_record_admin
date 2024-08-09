@@ -2,79 +2,55 @@
 import request from '../utils/request'
 
 //1、获取表格中需要渲染的数据以及入学年份、班级下拉框选项中的数据
-export const studentInfo = (years, classes, gender, isDisable, selectType, selectContent) => {
-    return request.post('/student/queryStuController',
+export const studentInfo = (initInfo) => {
+    return request.post('/stuManage/queryStudent/{}',
         {
-            form: {
-                years,
-                classes,
-                gender,
-                isDisable,
-                selectType,
-                selectContent,
-            }
+            initInfo
         }
     )
 }
 
-//2-1、单个添加学生
-export const singleAdd = (number, password, userName) => {
-    return request.post('', {
-        form: {
-            number,
-            password,
-            userName
-        }
+//2、单个添加学生
+export const singleAdd = (ruleForm) => {
+    return request.post('/stuManage/addStudent', {
+        ruleForm
     })
 }
 
-//2-1、批量添加学生
-
 //3、批量导出
 export const exportData = (userDataArr) => {
-    return request.post('', {
+    return request.post('/stuManage/outputMultipleStudent', {
         userDataArr      //放多个对象信息的数组
     })
 }
 
 //4、删除学生的账号
 export const deleteUser = (number) => {
-    return request.post('', {
-        form: {
-            number
-        }
+    return request.post('/stuManage/deleteStudent', {
+        number
     })
 }
 
 //5、设置管理员
-export const makeAdmin = (number, adminType) => {
-    return request.post(''), {
-        form: {
-            number,
-            adminType
-        }
-    }
+export const makeAdmin = (multipleSelection,type) => {
+    return request.post('/stuManage/setStudentManager',{
+        multipleSelection,
+        type
+    }) 
 }
 
 //6、编辑学生信息
-export const editStudentInfo = (number,classes,phoneNumber,password) => {
-    return request.post('',
+export const editStudentInfo = (editInfo) => {
+    return request.post('/stuManage/editStudent',
         {
-            form:{
-                number,
-                classes,
-                phoneNumber,
-                password
-            }
+           editInfo
         }
     )
 }
 
 //7、账户禁用
-export const MakeDisable = () => {
-    return request.post('',{
-        form:{
-            number
-        }
+export const MakeDisable = (number) => {
+    return request.post('/stuManage/banStudent', {
+        number
     })
 }

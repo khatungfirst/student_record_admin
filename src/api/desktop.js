@@ -2,15 +2,13 @@
 import request from '../utils/request'
 
 //1、获得首页所需要的数据
-export const getDesktopInfo = () => {
-    return request.post('/user/class/fpage')
+export const getDesktopInfo = (role) => {
+    return request.post(`/user/fpage/${role}`)
 }
 
 //2、选择日期后柱状图的数据变化
 export const updateHistogramInfo = (date) => {
     return request.post('',{
-        form: {
             date
-        }
     })
 }

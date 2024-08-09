@@ -8,7 +8,15 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+      // '/api': {
+      //   target: 'http://192.168.22.11:8881/api',
+      //   changeOrigin: true,
+      //   pathRewrite: {
+      //     '^/api': ''
+      //   }
+      // }
+    },
 
     // Various Dev Server settings
 
@@ -57,3 +65,21 @@ module.exports = {
     generateAnalyzerReport: process.env.npm_config_generate_report || false
   }
 }
+// const { defineConfig } = require('@vue/cli-service')
+// module.exports = defineConfig({
+//   publicPath: './',
+//   transpileDependencies: true,
+//   lintOnSave: false,
+//   // 代理服务器
+//   dev: {
+//     proxyTable: {
+//       '/api': {
+//         target: 'http://192.168.22.11:8881/api',
+//         changeOrigin: true,
+//         pathRewrite: {
+//           '^/api': ''
+//         }
+//       }
+//     }
+//   }
+// })

@@ -81,7 +81,7 @@
       <div class="columnar">
         <p class="hot">热门话题</p>
         <div class="date">
-          <el-date-picker type="date" placeholder="选择日期" v-model="date">
+          <el-date-picker type="date" placeholder="选择日期" v-model="date" :editable="false">
             <!-- :picker-options="pickerOptions" -->
           </el-date-picker>
         </div>
@@ -148,6 +148,7 @@
 import { mapGetters } from "vuex";
 import * as echarts from "echarts";
 import category from "./category.vue";
+import { getDesktopInfo } from "../../api/desktop";
 export default {
   name: "desktop",
   components: { category },
@@ -155,6 +156,7 @@ export default {
     return {
       //定义那个柱状图
       myChart: null,
+      // role:"",   ///存放登录用户的身份
       //定义柱状图上那个日期
       date: '',
       articleTotal:'',   //帖子总数
@@ -186,7 +188,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["name", "roles"]),
+    // ...mapGetters({role:'user/roles'}),
   },
   created() {
     this.handleListener();
@@ -194,6 +196,7 @@ export default {
   async mounted() {
     this.getInfo(); //获取这个页面需要的所有数据
     this.renderChart();
+    console.log(this.$store,'1111111');
   },
   methods: {
     //窗口变化后，柱状体进行调整重新渲染
@@ -226,7 +229,29 @@ export default {
     },
     //发送请求获取该页面所需要的数据
     async getInfo(){
+      this.role = this.$store.state.user.userInfo.role;
+      if(this.role === 'grade1' || this.role === 'grade2' || this.role === 'grade3' || this.role === 'grade4'){
+        this.role = 'grade'
+      }
+      console.log(this.role,'role');
+      const data = await getDesktopInfo(this.role);
+      this.articleTotal = data.article_total;
+      this.todayArticleTotal = data.today_article_total;
+      this.articleRatio = data.article_ratio;
+      this.todayVisitorTotal = data.today_visitor_total;
+      this.visitorRatio = data.visitor_ratio;
+      this.userTotal = data.user_total;
+      this.students = data.student_total;
+      this.teachers = data.teacher_total;
+      this.articleReadTotal = data.article_read_total;
+      this.likeTotal = data.upvote_amount;
+      this.chartOption = data.chartOption
+    },
 
+    //根据日期查询对应的柱状图数据
+    async dateCheck(){
+      const chartOption = await updateHistogramInfo(this.date);
+      this.chartOption = chartOption;
     }
   },
   beforeDestroy() {

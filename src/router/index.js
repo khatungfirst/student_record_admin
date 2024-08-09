@@ -33,20 +33,12 @@ export const constantRouterMap = [
       component: () => import('../views/manage/students.vue')
     },
     {
-      path: 'teachermanage',
-      component: () => import('../views/manage/teacher.vue')
-    },
-    {
-      path: 'postsmanage',
-      component: () => import('../views/manage/post.vue')
-    },
-    {
-      path: 'report',
-      component: () => import('../views/report/index.vue')
-    },
-    {
       path: 'menu',
       component: () => import('../views/manage/menuManage.vue')
+    },
+    {
+      path: 'star',
+      component: () => import('../views/star/star.vue')
     },
   ]
   },
@@ -67,64 +59,6 @@ export default new Router({
 })
 
 // 动态加载菜单
-// export const asyncRouterMap = [
-//   {
-//     name: '使用实例',
-//     path: '/examples',
-//     component: Layout,
-//     redirect: '/examples/table/list',
-//     meta: {
-//       title: '使用实例',
-//       icon: 'el-icon-tickets',
-//       roles: ['admin']
-//     },
-//     children: [
-//       {
-//         name: '数据列表',
-//         path: 'table/list',
-//         component: () => import('@/views/examples/table/list'),
-//         meta: {
-//           title: '数据列表',
-//           roles: ['admin']
-//         }
-//       },
-//       {
-//         name: '新增表单',
-//         meta: { title: '新增表单' },
-//         path: 'table/add',
-//         hidden: true,
-//         props: true,
-//         component: () => import('@/views/examples/form/edit')
-//       },
-//       {
-//         name: '编辑表单',
-//         meta: { title: '编辑表单' },
-//         path: 'table/edit/:id',
-//         hidden: true,
-//         props: true,
-//         component: () => import('@/views/examples/form/edit')
-//       }
-//     ]
-//   },
-//   {
-//     path: '/debug',
-//     component: Layout,
-//     redirect: '/debug/index',
-//     name: '系统日志',
-//     meta: {
-//       title: '系统日志',
-//       icon: 'el-icon-setting',
-//       roles: ['admin']
-//     },
-//     children: [
-//       {
-//         name: '错误日志',
-//         meta: { title: '错误日志' },
-//         path: 'index',
-//         props: true,
-//         component: () => import('@/views/debug/index')
-//       }
-//     ]
-//   },
-//   { path: '*', redirect: '/404', hidden: true }
-// ]
+export const asyncRouterMap = [
+  { path: '*', redirect: '/404', hidden: true }
+]

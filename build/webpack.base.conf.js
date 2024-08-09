@@ -1,7 +1,7 @@
 'use strict'
 const path = require('path')
 const utils = require('./utils')
-const config = require('../config')
+const config = require('../configs')
 const { VueLoaderPlugin } = require('vue-loader')
 
 function resolve(dir) {
@@ -53,7 +53,10 @@ module.exports = {
           resolve('src'),
           resolve('test'),
           resolve('node_modules/webpack-dev-server/client')
-        ]
+        ],
+        options: {
+          plugins: ['transform-es2015-modules-commonjs']
+        }
       },
       {
         test: /\.svg$/,

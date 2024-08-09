@@ -5,7 +5,7 @@
       <div class="first">
         <div class="year">
           <span>入学年份：</span>
-          <el-select v-model="year" clearable placeholder="请选择">
+          <el-select v-model="initInfo.year" clearable placeholder="请选择" @change="selectUser">
             <el-option
               v-for="item in yearOptions"
               :key="item.value"
@@ -17,7 +17,7 @@
         </div>
         <div class="class">
           <span>班级：</span>
-          <el-select v-model="classes" clearable placeholder="请选择">
+          <el-select v-model="initInfo.classes" clearable placeholder="请选择" @change="selectUser">
             <el-option
               v-for="item in classOptions"
               :key="item.value"
@@ -29,7 +29,7 @@
         </div>
         <div class="gnder">
           <span>性别：</span>
-          <el-select v-model="gender" clearable placeholder="请选择">
+          <el-select v-model="initInfo.gender" clearable placeholder="请选择" @change="selectUser">
             <el-option
               v-for="item in genderOptions"
               :key="item.value"
@@ -41,7 +41,12 @@
         </div>
         <div class="isDisable">
           <span>是否禁用：</span>
-          <el-select v-model="isDisable" clearable placeholder="请选择">
+          <el-select
+            v-model="initInfo.isDisable"
+            clearable
+            placeholder="请选择"
+            @change="selectUser"
+          >
             <el-option
               v-for="item in isDisableOptions"
               :key="item.value"
@@ -54,7 +59,11 @@
       </div>
       <div class="second">
         <div class="middle">
-          <el-select v-model="typeValue" clearable placeholder="请选择搜索类别">
+          <el-select
+            v-model="initInfo.typeValue"
+            clearable
+            placeholder="请选择搜索类别"
+          >
             <el-option
               v-for="item in typeOptions"
               :key="item.value"
@@ -65,12 +74,15 @@
           </el-select>
           <el-input
             placeholder="请输入内容"
-            v-model="input"
+            v-model="initInfo.input"
             clearable
             style="width: 65%"
           >
           </el-input>
-          <el-button type="primary" id="select">搜索</el-button>
+          <el-button type="primary" id="select" @click="selectUser">搜索</el-button>
+          <el-button type="success" plain id="add" @click="reloadStudents"
+            >重置</el-button
+          >
         </div>
         <div class="right">
           <el-button type="success" plain id="add" @click="addStudents"
@@ -105,11 +117,19 @@
                 <el-input v-model="ruleForm.password"></el-input>
               </el-form-item>
               <el-form-item label="姓名" prop="names" label-width="50px">
-                <el-input v-model="ruleForm.password"></el-input>
+                <el-input v-model="ruleForm.names"></el-input>
+              </el-form-item>
+              <el-form-item label="班级" prop="classes" label-width="50px">
+                <el-input v-model="ruleForm.classes"></el-input>
               </el-form-item>
             </el-form>
             <div class="signal-button">
-              <el-button style="padding: 3px 0" type="text">单个添加</el-button>
+              <el-button
+                style="padding: 3px 0"
+                type="text"
+                @click="addSignalStudent"
+                >单个添加</el-button
+              >
             </div>
           </div>
           <div class="text-right">
@@ -118,13 +138,15 @@
               class="upload-demo"
               drag
               :accept="'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'"
-              action="https://jsonplaceholder.typicode.com/posts/"
+              action="http://127.0.0.1:4523/m1/4869431-0-default/stuManage/addMultipleStudent"
               multiple
+              :on-success="uploadSuccess"
             >
               <i class="el-icon-upload"></i>
               <div class="el-upload__text">
                 将Excel表格文件拖到此处，或<em>点击上传</em>
               </div>
+              <div class="el-upload__tip" slot="tip">注：只能上传excel表格(其中包含个人的学号、密码、姓名、班级)</div>
             </el-upload>
           </div>
         </div>
@@ -149,7 +171,7 @@
         </div>
         <el-form label-width="80px" :model="editInfo">
           <el-form-item label="学号">
-            <el-input v-model="editInfo.class" disabled></el-input>
+            <el-input v-model="editInfo.username" disabled></el-input>
           </el-form-item>
           <el-form-item label="班级">
             <el-input v-model="editInfo.class"></el-input>
@@ -168,12 +190,19 @@
         <p>学员列表</p>
         <div class="top-right">
           <!-- 设为管理员按钮 -->
-          <el-dropdown trigger="click" placement="top-start">
+          <el-dropdown
+            trigger="click"
+            placement="top-start"
+            @command="setAdmin"
+            click="setAdmin"
+          >
             <span class="el-dropdown-link"> 设为管理员 </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>班级管理员</el-dropdown-item>
-              <el-dropdown-item>年级管理员</el-dropdown-item>
-              <el-dropdown-item>院级管理员</el-dropdown-item>
+              <el-dropdown-item command="class">班级管理员</el-dropdown-item>
+              <el-dropdown-item command="grade">年级管理员</el-dropdown-item>
+              <el-dropdown-item command="hospitalLevel"
+                >院级管理员</el-dropdown-item
+              >
             </el-dropdown-menu>
           </el-dropdown>
 
@@ -199,10 +228,10 @@
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" align="center"> </el-table-column>
-        <el-table-column prop="userName" label="姓名" align="center">
+        <el-table-column prop="name" label="姓名" align="center">
         </el-table-column>
         <el-table-column
-          prop="number"
+          prop="username"
           label="学号"
           show-overflow-tooltip
           align="center"
@@ -230,35 +259,36 @@
         >
         </el-table-column>
         <el-table-column
-          prop="phoneNumber"
+          prop="telephone"
           label="手机号"
           show-overflow-tooltip
           align="center"
         >
         </el-table-column>
         <el-table-column
-          prop="years"
+          prop="year"
           label="入学年份"
           show-overflow-tooltip
           align="center"
         >
         </el-table-column>
         <el-table-column
-          prop="isAdministrator"
+          prop="isAdmin"
           label="是否是管理员"
           show-overflow-tooltip
           align="center"
+          :formatter="isManagerFormatter"
         >
         </el-table-column>
         <el-table-column
-          prop="disable"
+          prop="ban"
           label="账户禁用"
           show-overflow-tooltip
           align="center"
         >
           <template slot-scope="scope">
             <el-switch
-              v-model="scope.row.value"
+              v-model="scope.row.ban"
               active-color="#13ce66"
               inactive-color="#ff4949"
               @change="disableButton(scope.row)"
@@ -274,19 +304,23 @@
           width="150px"
         >
           <template slot-scope="scope">
-            <a style="margin-right: 20px; color: #75d6a9" @click="editFun(scope.row)"
-            >编辑信息</a
-          >
-          <a style="margin-right: 20px; color: red" @click="deleteStudent(scope.row)"
-            >删除</a
-          >
+            <a
+              style="margin-right: 20px; color: #75d6a9"
+              @click="editFun(scope.row)"
+              >编辑信息</a
+            >
+            <a
+              style="margin-right: 20px; color: red"
+              @click="deleteStudent(scope.row)"
+              >删除</a
+            >
           </template>
         </el-table-column>
       </el-table>
 
       <!-- 分页 -->
       <div class="paginatio">
-        <span>批量导出</span>
+        <span @click="exportInfo">批量导出</span>
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -301,6 +335,14 @@
   </div>
 </template>
 <script>
+import { singleAdd } from "../../api/manageStudents";
+import { deleteUser } from "../../api/manageStudents";
+import { editStudentInfo } from "../../api/manageStudents";
+import { MakeDisable } from "../../api/manageStudents";
+import { makeAdmin } from "../../api/manageStudents";
+import { Message } from "element-ui"; // MessageBox
+import { exportData } from "../../api/manageStudents";
+import { studentInfo } from "../../api/manageStudents";
 export default {
   data() {
     return {
@@ -344,31 +386,39 @@ export default {
       ],
       //修改信息的一组数据
       editInfo: {
+        username: "",
         class: "",
         phoneNumber: "",
         password: "",
       },
-      //用来存放用户选择下拉框中的值
-      year: "",
-      classes: "",
-      gender: "",
-      isDisable: "",
-      input: "", //搜索框输入的内容
+
+      //存放多选中的用户信息
+      multipleSelection: [],
+      type: "", //用来存放设置的管理员的类型
+
+      //用来存放用户搜索的各个值
+      initInfo: {
+        year: "",
+        classes: "",
+        gender: "",
+        isDisable: "",
+        input: "", //搜索框输入的内容
+        typeValue: "", //选中的搜索类别
+      },
       display: "none",
-      typeValue: "", //选中的搜索类别
       editDisplay: "none", //控制修改学生信息的窗口的出现与否
       //表格里的数据
       tableData: [
         {
-          userName: "1",
-          number: "1",
+          name: "1",
+          username: "1",
           password: "1",
           class: "1",
-          years: "1",
-          phoneNumber: "1",
+          year: "1",
+          telephone: "1",
           gender: "1",
-          value: true, //禁用按钮是否开启
-          isAdministrator: "1", //是否是管理员
+          ban: true, //禁用按钮是否开启
+          isManager: true, //是否是管理员
         },
       ],
       currentNumber: [],
@@ -379,10 +429,13 @@ export default {
         userId: "",
         password: "",
         names: "",
+        classes: "",
       },
     };
   },
-  mounted() {},
+  async mounted() {
+   this.studentInfo()
+  },
   methods: {
     //用来手动控制表格中的选中状态
     toggleSelection(rows) {
@@ -409,17 +462,64 @@ export default {
       this.currentPage = val;
     },
 
-    //禁用按钮的点击事件
-    disableButton() {
-      console.log(this.tableData.value, "value");
-      this.tableData.value = !this.tableData.value;
+    //获得页面中所需要的所有数据
+    async studentInfo(){
+      const data = await studentInfo(this.initInfo)
+      this.init(data)
     },
 
-    //添加学生的方法
+    async selectUser(){
+        this.studentInfo();
+        console.log(this.initInfo);
+    },
+
+    //重置数据
+    reloadStudents(){
+      this.initInfo.year = '';
+      this.initInfo.classes = '';
+      this.initInfo.gender = '';
+      this.initInfo.isDisable = '';
+      this.initInfo.input = '';
+      this.initInfo.typeValue = '';
+      this.studentInfo();
+    },
+    //封禁学生/解除封禁
+    async disableButton(row) {
+      console.log(row.ban, "value");
+      this.tableData.value = !this.tableData.value;
+      const data = await MakeDisable(row.username);
+      this.init(data);
+    },
+
+    //出现添加学生弹窗的方法
     addStudents() {
       document.body.style = "pointer-events: none;";
       document.getElementById("middle").style = "pointer-events: auto;";
       this.display = "block";
+    },
+
+    //初始化
+    init(data) {
+      this.tableData = data.data.stuInfo;
+      this.yearOptions = data.data.year;
+      this.classOptions = data.data.class;
+      this.total = data.data.allStudentCount;
+    },
+
+    //单个添加学生的方法
+    async addSignalStudent() {
+      this.close();
+      const data = await singleAdd(this.ruleForm);
+      this.init(data);
+    },
+
+    //批量上传学生信息的相关方法
+    uploadSuccess(){
+      Message({
+        icon:'el-icon-check',
+        message:"上传成功",
+        duration: 1000,
+      })
     },
 
     //关闭添加学生的窗口
@@ -429,14 +529,23 @@ export default {
     },
 
     //点击编辑学生信息
-    editFun() {
+    editFun(row) {
+      console.log(row);
       this.editDisplay = "block";
       document.body.style = "pointer-events: none;";
       this.$refs.style = "pointer-events: auto;";
+      this.editInfo.username = row.name;
+      this.editInfo.class = row.class;
+      this.editInfo.phoneNumber = row.telephone;
+      this.editInfo.password = row.password;
     },
 
     //确定修改学生信息
-    makeSure() {},
+    async makeSure() {
+      const data = await editStudentInfo(this.editInfo);
+      this.init(data);
+      this.cancel();
+    },
 
     //取消修改学生信息
     cancel() {
@@ -445,10 +554,45 @@ export default {
     },
 
     //设为管理员
+    async setAdmin(command) {
+      console.log(this.multipleSelection, command);
+      if (this.multipleSelection.length === 0) {
+        Message({
+          message: "请选择你要设为管理员的人员",
+          type: "warning",
+        });
+      } else {
+        const data = await makeAdmin(this.multipleSelection, command);
+        this.init(data);
+      }
+    },
 
     //删除学生
-    deleteStudent(row) {
+    async deleteStudent(row) {
       console.log(row);
+      const data = await deleteUser(row.number);
+      this.init(data);
+    },
+
+    //批量导出用户信息
+    async exportInfo() {
+      if (this.multipleSelection.length === 0) {
+        Message({
+          message: "请选择你要批量导出的人员",
+          type: "warning",
+        });
+      } else {
+        await exportData(this.multipleSelection);
+      }
+    },
+    //将后端传来的是否是管理员的true和false转换为‘是’和‘否’
+    isManagerFormatter(row, column) {
+      // 在 formatter 中对 name 字段进行转换
+      if (row.isManager == true) {
+        return "是"; // 将 name 为 1 的数据转换为 2
+      } else {
+        return "否"; // 其他情况保持不变
+      }
     },
   },
 };
@@ -503,6 +647,7 @@ export default {
 
     .right {
       padding-right: 25%;
+      text-align: center;
     }
   }
 
@@ -525,7 +670,7 @@ export default {
   #middle,
   .edit {
     width: 50%;
-    height: 40vh;
+    // height: 50vh;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -560,13 +705,13 @@ export default {
       }
 
       .item {
-        height: 50vh;
+        // height: 50vh;
         display: flex;
         justify-content: space-around;
 
         .text-left {
           width: 50%;
-          height: 60%;
+          height: 80%;
           border-right: 1px solid rgb(130, 127, 127);
           padding-right: 5%;
 
@@ -598,6 +743,16 @@ export default {
 
         .text-right {
           width: 50%;
+
+           .el-upload {
+            width: 80%;
+            padding: 1px;
+          }
+
+          .el-upload__tip {
+            width: 80%;
+            margin:20px auto           
+          }
         }
 
         p {
