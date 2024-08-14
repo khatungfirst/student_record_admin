@@ -34,10 +34,10 @@ export const exportData = (userDataArr) => {
     )
 }
 
-//4、删除学生的账号
-export const deleteUser = (username) => {
+//4、设置管理员
+export const makeAdmin = (username) => {
     console.log(JSON.stringify(username));
-    return request.post('/stuManage/deleteStudent', JSON.stringify(
+    return request.post('/stuManage/setStudentManager', JSON.stringify(
         { username }
     ),
     {
@@ -47,10 +47,10 @@ export const deleteUser = (username) => {
     })
 }
 
-//5、设置管理员
-export const makeAdmin = (multipleSelection, type) => {
-    const data = JSON.stringify({ multipleSelection, type })
-    return request.post('/stuManage/setStudentManager', data,
+//5、批量删除学生的账号
+export const deleteUser = (selected_students) => {
+    const data = JSON.stringify({ selected_students})
+    return request.post('/stuManage/deleteStudent', data,
         {
             headers: {
                 'Content-Type': 'application/json'
@@ -82,13 +82,13 @@ export const MakeDisable = (username) => {
 }
 
 //8、分页获取数据
-export const pageData = (currentPage, pageSize) => {
-    const data = JSON.stringify({ currentPage, pageSize })
-    return request.post('/stuManage/queryPageStudent', data,
-        {
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        }
-    )
-}
+// export const pageData = (page, limit) => {
+//     const data = JSON.stringify({ page, limit })
+//     return request.post('/stuManage/queryPageStudent', data,
+//         {
+//             headers: {
+//                 'Content-Type': 'application/json'
+//             },
+//         }
+//     )
+// }

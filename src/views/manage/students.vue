@@ -203,18 +203,20 @@
         <p>学员列表</p>
         <div class="top-right">
           <!-- 设为管理员按钮 -->
-          <el-dropdown
+          <!-- <el-dropdown
             trigger="click"
             placement="top-start"
             @command="setAdmin"
             click="setAdmin"
-          >
-            <span class="el-dropdown-link"> 设为管理员 </span>
-            <el-dropdown-menu slot="dropdown">
+          > -->
+          <span class="el-dropdown-link" @click="deleteStudent">
+            批量删除
+          </span>
+          <!-- <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="class">班级管理员</el-dropdown-item>
               <el-dropdown-item command="grade">年级管理员</el-dropdown-item>
             </el-dropdown-menu>
-          </el-dropdown>
+          </el-dropdown> -->
 
           <!-- 说明 -->
           <el-popover
@@ -222,7 +224,7 @@
             title="注意："
             width="200"
             trigger="hover"
-            content="设置管理员时，先在表格中选择人员"
+            content="批量删除时，先在表格中选择人员"
           >
             <i class="el-icon-question" slot="reference"></i>
           </el-popover>
@@ -259,6 +261,7 @@
           label="性别"
           show-overflow-tooltip
           align="center"
+          width="50"
         >
         </el-table-column>
         <el-table-column
@@ -311,7 +314,7 @@
           label="操作"
           show-overflow-tooltip
           align="center"
-          width="150px"
+          width="250px"
         >
           <template slot-scope="scope">
             <a
@@ -321,8 +324,8 @@
             >
             <a
               style="margin-right: 20px; color: red"
-              @click="deleteStudent(scope.row)"
-              >删除</a
+              @click="setAdmin(scope.row)"
+              >设为管理员</a
             >
           </template>
         </el-table-column>
@@ -333,7 +336,7 @@
         <span @click="exportInfo">批量导出</span>
         <el-pagination
           @current-change="handleCurrentChange"
-          :current-page.sync="currentPage"
+          :current-page.sync="initInfo.page"
           :page-size="10"
           layout="total, prev, pager, next"
           :total="total"
@@ -401,11 +404,12 @@ export default {
         telephone: "",
         password: "",
       },
-
       //存放多选中的用户信息
       multipleSelection: [],
-      type: "", //用来存放设置的管理员的类型
-
+       //表格里的数据
+      tableData: [],
+       //存放多选选中数据的数组
+      selectedArr: [],
       //用来存放用户搜索的各个值
       initInfo: {
         year: null,
@@ -414,16 +418,9 @@ export default {
         isDisable: null,
         searchMessage: "", //搜索框输入的内容
         searchSelect: "", //选中的搜索类别
+        page: 1, //当前页数
+        limit: 10, //规定每页有多少条数据
       },
-      display: "none",
-      editDisplay: "none", //控制修改学生信息的窗口的出现与否
-      //表格里的数据
-      tableData: [],
-      selectedArr: [], //存放多选选中数据的数组
-      total: 30, //所有用户的数量
-      currentPage: 1, //当前页数
-      pageSize: 10, //规定每页有多少条数据
-      role: "", //用户的角色
       //添加学生的数据
       ruleForm: {
         username: "",
@@ -431,15 +428,27 @@ export default {
         name: "",
         class: "",
       },
+      display: "none",
+      //控制修改学生信息的窗口的出现与否
+      editDisplay: "none", 
+      //所有用户的数量
+      total: 30, 
+      //用户的角色
+      role: "", 
+      //当前页的数据长度
+      pageLength:0
     };
   },
   async mounted() {
+    localStorage.setItem("page",this.initInfo.page)
     this.init();
   },
   methods: {
     //初始化
     async init() {
       this.role = JSON.parse(localStorage.getItem("userInfo")).role;
+      this.initInfo.page = JSON.parse(localStorage.getItem("page"));
+      console.log(this.initInfo,'page');    
       const data = await studentInfo(this.initInfo, this.role);
       console.log(data, "请求");
       if (data.data !== null) {
@@ -447,19 +456,9 @@ export default {
         this.yearOptions = data.data.year;
         this.classOptions = data.data.class;
         this.total = data.data.allStudentCount;
+        this.pageLength = this.tableData.length
       } else {
         this.tableData = [];
-      }
-    },
-
-    //用来手动控制表格中的选中状态
-    toggleSelection(rows) {
-      if (rows) {
-        rows.forEach((row) => {
-          this.$refs.multipleTable.toggleRowSelection(row);
-        });
-      } else {
-        this.$refs.multipleTable.clearSelection();
       }
     },
 
@@ -477,13 +476,15 @@ export default {
     //切换表格的页数
     async handleCurrentChange(val) {
       console.log(`当前页: ${val}`);
-      this.currentPage = val;
-      const data = await pageData(this.currentPage, this.pageSize);
-      this.tableData = data;
+      this.initInfo.page = val;
+      localStorage.setItem("page",this.initInfo.page)
+      // const data = await pageData(this.initInfo.page, this.limit);
+      this.init();
     },
 
     //重置数据
     reloadStudents() {
+      this.searchSelect = [];
       this.initInfo.year = null;
       this.initInfo.class = "";
       this.initInfo.gender = "";
@@ -496,10 +497,11 @@ export default {
     //封禁学生/解除封禁
     async disableButton(row) {
       console.log(row.ban, "value");
-      this.tableData.value = !this.tableData.value;    
-      await MakeDisable(row.username);
-      console.log(this.tableData.value); 
-      this.init();
+      const { code } = await MakeDisable(row.username);
+      if (code === 200) {
+        this.tableData.value = !this.tableData.value;
+      }
+      console.log(this.tableData.value);
     },
 
     //出现添加学生弹窗的方法
@@ -516,7 +518,7 @@ export default {
       this.init();
       for (let key in this.ruleForm) {
         if (this.ruleForm.hasOwnProperty(key)) {
-          this.ruleForm[key] = ''; // 或者使用 '' 或 []
+          this.ruleForm[key] = ""; // 或者使用 '' 或 []
         }
       }
     },
@@ -562,24 +564,27 @@ export default {
       document.body.style = "pointer-events: auto;";
     },
 
-    //设为管理员
-    async setAdmin(command) {
-      console.log(this.multipleSelection, command);
+    //批量删除学生
+    async deleteStudent() {
       if (this.selectedArr.length === 0) {
         Message({
-          message: "请选择你要设为管理员的人员",
+          message: "请选择你要删除的人员",
           type: "warning",
         });
       } else {
-        await makeAdmin(this.selectedArr, command);
+        await deleteUser(this.selectedArr);
+        if(this.selectedArr.length === this.pageLength){
+          localStorage.setItem("page",this.initInfo.page-1)
+        }
         this.init();
       }
+      this.selectedArr = [];
     },
 
-    //删除学生
-    async deleteStudent(row) {
+    //设为管理员
+    async setAdmin(row) {
       console.log(row, "111111");
-      await deleteUser(row.username);
+      await makeAdmin(row.username);
       this.init();
     },
 
@@ -801,8 +806,9 @@ export default {
         margin-right: 30px;
         padding-top: 6px;
 
-        .el-dropdown {
-          width: 120px;
+        .el-dropdown-link {
+          display: inline-block;
+          width: 100px;
           height: 30px;
           line-height: 30px;
           text-align: center;
