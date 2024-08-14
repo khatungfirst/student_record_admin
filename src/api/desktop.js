@@ -15,3 +15,4 @@ export const updateHistogramInfo = (date) => {
         // }
     })
 }
+//111

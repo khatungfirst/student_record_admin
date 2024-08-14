@@ -30,6 +30,7 @@ export default {
       console.log('breadcrumb', matched)
       matched = [{ path: '/desktop', meta: { title: '首页' }}].concat(matched)
       this.levelList = matched
+      
     }
   }
 }
