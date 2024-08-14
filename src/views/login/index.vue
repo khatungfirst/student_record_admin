@@ -68,7 +68,7 @@
             </el-input>
           </div>
           <div class="verificationRight">
-            <img src="" alt="" />
+            <img src="" alt="" @click="getPicCodeFun"/>
           </div>
         </div>
         <el-form-item>
@@ -121,7 +121,7 @@ export default {
       // console.log(this.loginForm.right_verify, "???");
       //判断验证码是否正确
       if (this.loginForm.verify === this.loginForm.right_verify) {
-        console.log('111111');
+        console.log(this.loginForm.verify,'111111');
         const data = await login(
           this.loginForm.username,
           this.loginForm.password,

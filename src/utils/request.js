@@ -4,9 +4,12 @@ import { Message } from 'element-ui' // MessageBox
 import store from '../store'
 import { getToken } from '@/utils/auth'
 
+import {baseURL} from '../../configs/index'
 // 创建axios实例，将来对创建出来的实例，进行自定义配置；；不会污染原始的axios实例
 const service = axios.create({
-  baseURL: 'http://192.168.22.11:8881/api',
+  // baseURL: 'http://localhost:3000',
+  // baseURL: baseURL,
+   baseURL: process.env.NODE_ENV === 'production' ? 'http://192.168.10.7:8881' : '/api',
   timeout: 15000
 })
 
@@ -18,9 +21,12 @@ service.interceptors.request.use(config => {
   //   loadingType: 'spinner',
   //   duration: 0
   // })
-  if (store.getters.token) {
-    config.headers['Admin-Token'] = getToken()
+
+  
+  if (localStorage.getItem('token')) {
+    config.headers['token'] = getToken()
   }
+  
   return config
 }, error => {
   Promise.reject(error)

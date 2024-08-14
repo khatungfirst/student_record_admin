@@ -5,7 +5,12 @@
       <div class="first">
         <div class="year">
           <span>入学年份：</span>
-          <el-select v-model="initInfo.year" clearable placeholder="请选择" @change="selectUser">
+          <el-select
+            v-model="initInfo.year"
+            clearable
+            placeholder="请选择"
+            @change="init"
+          >
             <el-option
               v-for="item in yearOptions"
               :key="item.value"
@@ -17,7 +22,12 @@
         </div>
         <div class="class">
           <span>班级：</span>
-          <el-select v-model="initInfo.classes" clearable placeholder="请选择" @change="selectUser">
+          <el-select
+            v-model="initInfo.class"
+            clearable
+            placeholder="请选择"
+            @change="init"
+          >
             <el-option
               v-for="item in classOptions"
               :key="item.value"
@@ -29,7 +39,12 @@
         </div>
         <div class="gnder">
           <span>性别：</span>
-          <el-select v-model="initInfo.gender" clearable placeholder="请选择" @change="selectUser">
+          <el-select
+            v-model="initInfo.gender"
+            clearable
+            placeholder="请选择"
+            @change="init"
+          >
             <el-option
               v-for="item in genderOptions"
               :key="item.value"
@@ -45,7 +60,7 @@
             v-model="initInfo.isDisable"
             clearable
             placeholder="请选择"
-            @change="selectUser"
+            @change="init"
           >
             <el-option
               v-for="item in isDisableOptions"
@@ -60,7 +75,7 @@
       <div class="second">
         <div class="middle">
           <el-select
-            v-model="initInfo.typeValue"
+            v-model="initInfo.searchSelect"
             clearable
             placeholder="请选择搜索类别"
           >
@@ -74,12 +89,12 @@
           </el-select>
           <el-input
             placeholder="请输入内容"
-            v-model="initInfo.input"
+            v-model="initInfo.searchMessage"
             clearable
             style="width: 65%"
           >
           </el-input>
-          <el-button type="primary" id="select" @click="selectUser">搜索</el-button>
+          <el-button type="primary" id="select" @click="init">搜索</el-button>
           <el-button type="success" plain id="add" @click="reloadStudents"
             >重置</el-button
           >
@@ -95,10 +110,6 @@
       <el-card class="box-card">
         <div slot="header" class="clearfix">
           <span>添加学生</span>
-          <!-- <div class="buttonBox">
-            <el-button style="padding: 3px 0" type="text">确定</el-button>
-            <el-button style="padding: 3px 0" type="text">取消</el-button>
-          </div> -->
           <i class="el-icon-circle-close" @click="close"></i>
         </div>
         <div class="text item">
@@ -110,17 +121,17 @@
               label-width="100px"
               class="demo-ruleForm"
             >
-              <el-form-item label="账号" prop="userId" label-width="50px">
-                <el-input v-model="ruleForm.userId"></el-input>
+              <el-form-item label="账号" prop="username" label-width="50px">
+                <el-input v-model="ruleForm.username"></el-input>
               </el-form-item>
               <el-form-item label="密码" prop="password" label-width="50px">
                 <el-input v-model="ruleForm.password"></el-input>
               </el-form-item>
-              <el-form-item label="姓名" prop="names" label-width="50px">
-                <el-input v-model="ruleForm.names"></el-input>
+              <el-form-item label="姓名" prop="name" label-width="50px">
+                <el-input v-model="ruleForm.name"></el-input>
               </el-form-item>
-              <el-form-item label="班级" prop="classes" label-width="50px">
-                <el-input v-model="ruleForm.classes"></el-input>
+              <el-form-item label="班级" prop="class" label-width="50px">
+                <el-input v-model="ruleForm.class"></el-input>
               </el-form-item>
             </el-form>
             <div class="signal-button">
@@ -146,7 +157,9 @@
               <div class="el-upload__text">
                 将Excel表格文件拖到此处，或<em>点击上传</em>
               </div>
-              <div class="el-upload__tip" slot="tip">注：只能上传excel表格(其中包含个人的学号、密码、姓名、班级)</div>
+              <div class="el-upload__tip" slot="tip">
+                注：只能上传excel表格(其中包含个人的学号、密码、姓名、班级)
+              </div>
             </el-upload>
           </div>
         </div>
@@ -177,7 +190,7 @@
             <el-input v-model="editInfo.class"></el-input>
           </el-form-item>
           <el-form-item label="电话号">
-            <el-input v-model="editInfo.phoneNumber"></el-input>
+            <el-input v-model="editInfo.telephone"></el-input>
           </el-form-item>
           <el-form-item label="密码">
             <el-input v-model="editInfo.password"></el-input>
@@ -200,9 +213,6 @@
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="class">班级管理员</el-dropdown-item>
               <el-dropdown-item command="grade">年级管理员</el-dropdown-item>
-              <el-dropdown-item command="hospitalLevel"
-                >院级管理员</el-dropdown-item
-              >
             </el-dropdown-menu>
           </el-dropdown>
 
@@ -225,7 +235,7 @@
         tooltip-effect="dark"
         style="width: 100%"
         header-align="center"
-        @selection-change="handleSelectionChange"
+        @select="handleSelectionChange"
       >
         <el-table-column type="selection" align="center"> </el-table-column>
         <el-table-column prop="name" label="姓名" align="center">
@@ -322,7 +332,6 @@
       <div class="paginatio">
         <span @click="exportInfo">批量导出</span>
         <el-pagination
-          @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :current-page.sync="currentPage"
           :page-size="10"
@@ -343,6 +352,7 @@ import { makeAdmin } from "../../api/manageStudents";
 import { Message } from "element-ui"; // MessageBox
 import { exportData } from "../../api/manageStudents";
 import { studentInfo } from "../../api/manageStudents";
+import { pageData } from "../../api/manageStudents";
 export default {
   data() {
     return {
@@ -361,26 +371,26 @@ export default {
       ],
       isDisableOptions: [
         {
-          value: "未禁用",
+          value: false,
           label: "未禁用",
         },
         {
-          value: "已禁用",
+          value: true,
           label: "已禁用",
         },
       ],
       //存放搜索类别的数组
       typeOptions: [
         {
-          value: "姓名",
+          value: "name",
           label: "姓名",
         },
         {
-          value: "学号",
+          value: "username",
           label: "学号",
         },
         {
-          value: "手机号",
+          value: "phone_number",
           label: "手机号",
         },
       ],
@@ -388,7 +398,7 @@ export default {
       editInfo: {
         username: "",
         class: "",
-        phoneNumber: "",
+        telephone: "",
         password: "",
       },
 
@@ -398,45 +408,50 @@ export default {
 
       //用来存放用户搜索的各个值
       initInfo: {
-        year: "",
-        classes: "",
+        year: null,
+        class: "",
         gender: "",
-        isDisable: "",
-        input: "", //搜索框输入的内容
-        typeValue: "", //选中的搜索类别
+        isDisable: null,
+        searchMessage: "", //搜索框输入的内容
+        searchSelect: "", //选中的搜索类别
       },
       display: "none",
       editDisplay: "none", //控制修改学生信息的窗口的出现与否
       //表格里的数据
-      tableData: [
-        {
-          name: "1",
-          username: "1",
-          password: "1",
-          class: "1",
-          year: "1",
-          telephone: "1",
-          gender: "1",
-          ban: true, //禁用按钮是否开启
-          isManager: true, //是否是管理员
-        },
-      ],
-      currentNumber: [],
+      tableData: [],
+      selectedArr: [], //存放多选选中数据的数组
       total: 30, //所有用户的数量
       currentPage: 1, //当前页数
+      pageSize: 10, //规定每页有多少条数据
+      role: "", //用户的角色
       //添加学生的数据
       ruleForm: {
-        userId: "",
+        username: "",
         password: "",
-        names: "",
-        classes: "",
+        name: "",
+        class: "",
       },
     };
   },
   async mounted() {
-   this.studentInfo()
+    this.init();
   },
   methods: {
+    //初始化
+    async init() {
+      this.role = JSON.parse(localStorage.getItem("userInfo")).role;
+      const data = await studentInfo(this.initInfo, this.role);
+      console.log(data, "请求");
+      if (data.data !== null) {
+        this.tableData = data.data.stuInfo;
+        this.yearOptions = data.data.year;
+        this.classOptions = data.data.class;
+        this.total = data.data.allStudentCount;
+      } else {
+        this.tableData = [];
+      }
+    },
+
     //用来手动控制表格中的选中状态
     toggleSelection(rows) {
       if (rows) {
@@ -447,48 +462,44 @@ export default {
         this.$refs.multipleTable.clearSelection();
       }
     },
+
     //将这个选中的行数据数组赋值给 multipleSelection 变量
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
-      console.log(this.multipleSelection, "!!!");
+    handleSelectionChange(selection, val) {
+      if (!this.selectedArr.includes(val)) {
+        this.multipleSelection = val;
+        this.selectedArr.push(this.multipleSelection); //返回的是数组长度！！影响原数组
+      } else {
+        console.log("去掉");
+        this.selectedArr = this.selectedArr.filter((item) => item !== val); //不会改变原数组！！
+      }
     },
-    handleSizeChange(val) {
-      this.pageSize = 10;
-      this.currentPage = 1;
-      console.log(`每页 ${val} 条`);
-    },
-    handleCurrentChange(val) {
+
+    //切换表格的页数
+    async handleCurrentChange(val) {
       console.log(`当前页: ${val}`);
       this.currentPage = val;
-    },
-
-    //获得页面中所需要的所有数据
-    async studentInfo(){
-      const data = await studentInfo(this.initInfo)
-      this.init(data)
-    },
-
-    async selectUser(){
-        this.studentInfo();
-        console.log(this.initInfo);
+      const data = await pageData(this.currentPage, this.pageSize);
+      this.tableData = data;
     },
 
     //重置数据
-    reloadStudents(){
-      this.initInfo.year = '';
-      this.initInfo.classes = '';
-      this.initInfo.gender = '';
-      this.initInfo.isDisable = '';
-      this.initInfo.input = '';
-      this.initInfo.typeValue = '';
-      this.studentInfo();
+    reloadStudents() {
+      this.initInfo.year = null;
+      this.initInfo.class = "";
+      this.initInfo.gender = "";
+      this.initInfo.isDisable = null;
+      this.initInfo.searchMessage = "";
+      this.initInfo.searchSelect = "";
+      this.init();
     },
+
     //封禁学生/解除封禁
     async disableButton(row) {
       console.log(row.ban, "value");
-      this.tableData.value = !this.tableData.value;
-      const data = await MakeDisable(row.username);
-      this.init(data);
+      this.tableData.value = !this.tableData.value;    
+      await MakeDisable(row.username);
+      console.log(this.tableData.value); 
+      this.init();
     },
 
     //出现添加学生弹窗的方法
@@ -498,28 +509,26 @@ export default {
       this.display = "block";
     },
 
-    //初始化
-    init(data) {
-      this.tableData = data.data.stuInfo;
-      this.yearOptions = data.data.year;
-      this.classOptions = data.data.class;
-      this.total = data.data.allStudentCount;
-    },
-
     //单个添加学生的方法
     async addSignalStudent() {
       this.close();
-      const data = await singleAdd(this.ruleForm);
-      this.init(data);
+      await singleAdd(this.ruleForm);
+      this.init();
+      for (let key in this.ruleForm) {
+        if (this.ruleForm.hasOwnProperty(key)) {
+          this.ruleForm[key] = ''; // 或者使用 '' 或 []
+        }
+      }
     },
 
     //批量上传学生信息的相关方法
-    uploadSuccess(){
+    uploadSuccess() {
       Message({
-        icon:'el-icon-check',
-        message:"上传成功",
+        icon: "el-icon-check",
+        message: "上传成功",
         duration: 1000,
-      })
+      });
+      this.init();
     },
 
     //关闭添加学生的窗口
@@ -534,16 +543,16 @@ export default {
       this.editDisplay = "block";
       document.body.style = "pointer-events: none;";
       this.$refs.style = "pointer-events: auto;";
-      this.editInfo.username = row.name;
+      this.editInfo.username = row.username;
       this.editInfo.class = row.class;
-      this.editInfo.phoneNumber = row.telephone;
+      this.editInfo.telephone = row.telephone;
       this.editInfo.password = row.password;
     },
 
     //确定修改学生信息
     async makeSure() {
-      const data = await editStudentInfo(this.editInfo);
-      this.init(data);
+      await editStudentInfo(this.editInfo);
+      this.init();
       this.cancel();
     },
 
@@ -556,22 +565,22 @@ export default {
     //设为管理员
     async setAdmin(command) {
       console.log(this.multipleSelection, command);
-      if (this.multipleSelection.length === 0) {
+      if (this.selectedArr.length === 0) {
         Message({
           message: "请选择你要设为管理员的人员",
           type: "warning",
         });
       } else {
-        const data = await makeAdmin(this.multipleSelection, command);
-        this.init(data);
+        await makeAdmin(this.selectedArr, command);
+        this.init();
       }
     },
 
     //删除学生
     async deleteStudent(row) {
-      console.log(row);
-      const data = await deleteUser(row.number);
-      this.init(data);
+      console.log(row, "111111");
+      await deleteUser(row.username);
+      this.init();
     },
 
     //批量导出用户信息
@@ -585,6 +594,7 @@ export default {
         await exportData(this.multipleSelection);
       }
     },
+
     //将后端传来的是否是管理员的true和false转换为‘是’和‘否’
     isManagerFormatter(row, column) {
       // 在 formatter 中对 name 字段进行转换
@@ -608,6 +618,10 @@ export default {
 
   .top {
     margin: 2vh 0px;
+
+    .el-select {
+      height: 32px;
+    }
     .first {
       display: flex;
       flex-wrap: wrap;
@@ -744,14 +758,14 @@ export default {
         .text-right {
           width: 50%;
 
-           .el-upload {
+          .el-upload {
             width: 80%;
             padding: 1px;
           }
 
           .el-upload__tip {
             width: 80%;
-            margin:20px auto           
+            margin: 20px auto;
           }
         }
 

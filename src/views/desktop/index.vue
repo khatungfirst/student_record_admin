@@ -14,7 +14,7 @@
               <p>帖子数量</p>
             </template>
             <template #total>
-              <p style="font-size: 22px">533</p>
+              <p style="font-size: 22px">{{ articleTotal }}</p>
             </template>
           </category>
         </el-col>
@@ -30,10 +30,10 @@
               <p>今日帖子数量</p>
             </template>
             <template #total>
-              <p style="font-size: 22px">533</p>
+              <p style="font-size: 22px">{{ todayArticleTotal }}</p>
             </template>
             <template #proportion>
-              <span style="font-size: 15px">+1.2%同昨天对比</span></template
+              <span style="font-size: 15px">+{{articleRatio}}%同昨天对比</span></template
             >
           </category>
         </el-col>
@@ -49,10 +49,10 @@
               <p>今日访客数</p>
             </template>
             <template #total>
-              <p style="font-size: 22px">533</p>
+              <p style="font-size: 22px">{{ todayVisitorTotal }}</p>
             </template>
             <template #proportion>
-              <span style="font-size: 15px">+1.2%同昨天对比</span></template
+              <span style="font-size: 15px">+{{visitorRatio}}%同昨天对比</span></template
             >
           </category>
         </el-col>
@@ -68,7 +68,7 @@
               <p>人员总数</p>
             </template>
             <template #total>
-              <p style="font-size: 22px">533</p>
+              <p style="font-size: 22px">{{ userTotal}}</p>
             </template>
           </category>
         </el-col>
@@ -81,7 +81,7 @@
       <div class="columnar">
         <p class="hot">热门话题</p>
         <div class="date">
-          <el-date-picker type="date" placeholder="选择日期" v-model="date" :editable="false">
+          <el-date-picker type="date" placeholder="选择日期" v-model="date" :editable="false" @change="dateCheck" value-format="yyyy-MM-dd">
             <!-- :picker-options="pickerOptions" -->
           </el-date-picker>
         </div>
@@ -105,7 +105,7 @@
             </div>
             <div class="text">
               <p>学生人数</p>
-              <p>84</p>
+              <p>{{ students }}</p>
             </div>
           </el-col>
 
@@ -115,7 +115,7 @@
             </div>
             <div class="text">
               <p>教师数</p>
-              <p>84</p>
+              <p>{{ teachers }}</p>
             </div>
           </el-col>
         </el-row>
@@ -126,7 +126,7 @@
             </div>
             <div class="text">
               <p>总贴数</p>
-              <p>84</p>
+              <p>{{articleReadTotal  }}</p>
             </div>
           </el-col>
           <el-col :span="12">
@@ -135,7 +135,7 @@
             </div>
             <div class="text">
               <p>总阅读数</p>
-              <p>84</p>
+              <p>{{ likeTotal }}</p>
             </div>
           </el-col>
         </el-row>
@@ -149,6 +149,7 @@ import { mapGetters } from "vuex";
 import * as echarts from "echarts";
 import category from "./category.vue";
 import { getDesktopInfo } from "../../api/desktop";
+import {updateHistogramInfo} from '../../api/desktop'
 export default {
   name: "desktop",
   components: { category },
@@ -167,23 +168,10 @@ export default {
       userTotal: '',    //人员总数
       students: '',      //学生总数
       teachers: '',      //教师总数
-      articleReadTotal: '',    //总阅读数
+      articleReadTotal: '',    //总帖数
       likeTotal: '',      //获赞总数
       //柱形图中的数据
       chartOption: {
-        xAxis: {
-          type: "category",
-          data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-        },
-        yAxis: {
-          type: "value",
-        },
-        series: [
-          {
-            data: [120, 200, 150, 80, 70, 110, 130],
-            type: "bar",
-          },
-        ],
       },
     };
   },
@@ -229,12 +217,14 @@ export default {
     },
     //发送请求获取该页面所需要的数据
     async getInfo(){
-      this.role = this.$store.state.user.userInfo.role;
+      // this.role = this.$store.state.user.userInfo.role;
+      this.role = JSON.parse(localStorage.getItem('userInfo')).role
       if(this.role === 'grade1' || this.role === 'grade2' || this.role === 'grade3' || this.role === 'grade4'){
         this.role = 'grade'
       }
-      console.log(this.role,'role');
-      const data = await getDesktopInfo(this.role);
+      const totalData = await getDesktopInfo(this.role);
+      const data = totalData.data
+      console.log(data,'data111');     
       this.articleTotal = data.article_total;
       this.todayArticleTotal = data.today_article_total;
       this.articleRatio = data.article_ratio;
@@ -245,13 +235,16 @@ export default {
       this.teachers = data.teacher_total;
       this.articleReadTotal = data.article_read_total;
       this.likeTotal = data.upvote_amount;
-      this.chartOption = data.chartOption
+      this.chartOption = data.chartOption;
+      this.renderChart()
     },
 
     //根据日期查询对应的柱状图数据
     async dateCheck(){
+      console.log(this.date,'date');    
       const chartOption = await updateHistogramInfo(this.date);
       this.chartOption = chartOption;
+      this.renderChart()
     }
   },
   beforeDestroy() {

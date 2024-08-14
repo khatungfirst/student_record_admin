@@ -29,7 +29,7 @@ export default {
   },
   methods: {
     logout() {
-      this.$store.dispatch("LogOut")
+      this.$store.dispatch("user/LogOut")
       this.$router.push('/login')
     },
   },
