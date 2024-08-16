@@ -272,7 +272,7 @@ export default {
     //重置表格中的数据操作
     reset() {
       this.selectInput = "";
-      this.init()
+      this.init(                   )
     },
 
     //点击新建菜单

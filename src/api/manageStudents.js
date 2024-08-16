@@ -15,41 +15,52 @@ export const studentInfo = (initInfo, role) => {
 //2、单个添加学生
 export const singleAdd = (ruleForm) => {
     return request.post('/stuManage/addSingleStudent', JSON.stringify(ruleForm),
-    {
-        headers: {
-            'Content-Type': 'application/json'
-        },
-    })
-}
-
-//3、批量导出
-export const exportData = (userDataArr) => {
-    return request.post('/stuManage/outputMultipleStudent',
-        JSON.stringify(userDataArr)      //放多个对象信息的数组
-        , {
+        {
             headers: {
                 'Content-Type': 'application/json'
             },
+        })
+}
+
+//3、批量导出
+export function exportData(selected_students) {
+    fetch('/api/stuManage/outputMultipleStudent',
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({selected_students:selected_students})
         }
-    )
+    ).then(response => response.blob()) // 处理响应，将其转换为blob
+    .then(blob => {
+      // 创建下载链接并触发下载
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'exported-data.xlsx'; // 设置下载文件名
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url); // 清理
+    })
+    .catch(error => console.error('导出失败:', error));
 }
 
 //4、设置管理员
-export const makeAdmin = (username) => {
-    console.log(JSON.stringify(username));
+export const makeAdmin = (student,managerType) => {
     return request.post('/stuManage/setStudentManager', JSON.stringify(
-        { username }
+        { student, managerType}
     ),
-    {
-        headers: {
-            'Content-Type': 'application/json'
-        },
-    })
+        {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
 }
 
 //5、批量删除学生的账号
 export const deleteUser = (selected_students) => {
-    const data = JSON.stringify({ selected_students})
+    const data = JSON.stringify({ selected_students })
     return request.post('/stuManage/deleteStudent', data,
         {
             headers: {
@@ -62,7 +73,7 @@ export const deleteUser = (selected_students) => {
 //6、编辑学生信息
 export const editStudentInfo = (editInfo) => {
     editInfo = JSON.stringify(editInfo)
-    return request.post('/stuManage/editStudent',editInfo,
+    return request.post('/stuManage/editStudent', editInfo,
         {
             headers: {
                 'Content-Type': 'application/json'
@@ -74,11 +85,11 @@ export const editStudentInfo = (editInfo) => {
 //7、账户禁用
 export const MakeDisable = (username) => {
     return request.post('/stuManage/banStudent', JSON.stringify({ username }),
-    {
-        headers: {
-            'Content-Type': 'application/json'
-        },
-    })
+        {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
 }
 
 //8、分页获取数据

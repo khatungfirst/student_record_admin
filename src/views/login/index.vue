@@ -194,6 +194,9 @@ export default {
     } catch (error) {
       console.error("Error in mounted hook:", error);
     }
+    if(JSON.parse(localStorage.getItem('selectionsTotal'))){
+      localStorage.setItem('selectionsTotal',0)
+    }
   },
 };
 </script>

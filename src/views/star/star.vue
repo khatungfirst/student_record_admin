@@ -5,7 +5,7 @@
     <div class="top">
       <el-input placeholder="请搜索要推选的人的姓名" v-model="search">
       </el-input>
-      <el-button type="primary" icon="el-icon-search" @click="searchSelection"
+      <el-button type="primary" icon="el-icon-search" @click="initStar"
         >搜索</el-button
       >
     </div>
@@ -28,7 +28,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="i in table" :key="i.username">
+          <tr v-if="table.length === 0">
+            <td colspan="9" class="empty" style="text-align: center">
+              暂时没有数据
+            </td>
+          </tr>
+          <tr v-else v-for="i in table" :key="i.username">
             <td>
               <el-checkbox
                 :value="i.status"
@@ -68,14 +73,30 @@
       </table>
       <div class="middle-bottom">
         <div class="block">
-          <el-pagination layout="prev, pager, next" :total="1000">
+          <el-pagination
+            @current-change="handleCurrentChange"
+            :current-page.sync="page"
+            :page-size="5"
+            layout="total, prev, pager, next"
+            :total="total"
+          >
           </el-pagination>
         </div>
         <div class="middle-button">
-          <el-button type="primary" @click="newSelect"
+          <el-tooltip placement="top">
+            <div slot="content">重新选择只在推选前有效</div>
+            <i class="el-icon-question"></i>
+          </el-tooltip>
+          <el-button
+            type="primary"
+            @click="newSelect"
+            :disabled="buttonDisabled"
             >重新选择<i class="el-icon-refresh-right"></i
           ></el-button>
-          <el-button type="primary" @click="electUsers" ref="electButton"
+          <el-button
+            type="primary"
+            @click="electUsers"
+            :disabled="buttonDisabled"
             >推选<i class="el-icon-s-promotion"></i
           ></el-button>
           <el-button type="primary" @click="publicStar">发布</el-button>
@@ -113,13 +134,8 @@
             <i class="el-icon-star-on"></i
             ><i class="el-icon-star-on"></i>年级之星
           </p>
-          <div v-for="(item, index1) in gradeData" :key="index1" class="list">
-            <p>{{ item.gradeName }}:</p>
-            <span
-              v-for="(item, index) in gradeData[index1].gradeStar"
-              :key="index"
-              >{{ item }}</span
-            >
+          <div v-for="(item, index) in gradeData" :key="index" class="list">
+            <span>{{ item.gradeName }}-{{ item.gradeClass }}</span>
           </div>
         </div>
         <div class="hospitalPublicity">
@@ -127,17 +143,8 @@
             <i class="el-icon-star-on"></i><i class="el-icon-star-on"></i
             ><i class="el-icon-star-on"></i>院级之星
           </p>
-          <div
-            v-for="(item, index1) in hospitalData"
-            :key="index1"
-            class="list"
-          >
-            <p>{{ item.hospitalName }}:</p>
-            <span
-              v-for="(item, index) in hospitalData[index1].hospitalStar"
-              :key="index"
-              >{{ item }}</span
-            >
+          <div v-for="(item, index) in hospitalData" :key="index" class="list">
+            <span>{{ item.gradeName }}-{{ item.gradeClass }}</span>
           </div>
         </div>
       </div>
@@ -148,7 +155,7 @@
 import { Message } from "element-ui"; // MessageBox
 import { mapState, mapMutations } from "vuex";
 import { initStar } from "../../api/star";
-import { searchStar } from "../../api/star";
+import { optional } from "../../api/star";
 import { elected } from "../../api/star";
 import { publicStar } from "../../api/star";
 import { termStar } from "../../api/star";
@@ -156,44 +163,92 @@ export default {
   data() {
     return {
       search: "", //存放搜索框中的内容
-      //表格中所需要的所有数据
-      tableData: [],
+      tableData: [], //表格中所需要的所有数据
       table: [], //表格数据的中间介质
       mul: [], //存放要推选的人的所有信息
-      term: "", //存放搜索的届数
+      term: null, //存放搜索的届数
       classData: [], //存放班级之星的名单
       gradeData: [], //存放年级之星的名单
       hospitalData: [], //存放院级之星的名单
       isSelected: false, //定义多选框是否选中
       remainder: 3, //存放剩余的推选名额
       maxSelectedCount: 3, // 最多推选人数
-      isAll: false,
+      isAll: false, //全选框的状态
       isDisabled: false, //多选框是否禁用
-      onePageNumber: 5, //存放表格一页放几个数据
-      selectedRowKeys:[]   //存储选中行的key值
+      limit: 5, //存放表格一页放几个数据
+      page: 1, //表示当前在第几页
+      // currentPageNumber:0,  //表示当前页数据的条数
+      total: 0, //表格中总共有多少数据
+      selectionsTotal: 0, //表示已推选的人员总数
+      buttonDisabled: false, //表示两个按钮是否被禁用
     };
   },
   async created() {
-    this.initStar();
+    localStorage.setItem("starPage", this.page);
+    if (localStorage.getItem("selectionsTotal")) {
+      this.selectionsTotal = JSON.parse(
+        localStorage.getItem("selectionsTotal")
+      );
+    }
+    localStorage.setItem("selectionsTotal", this.selectionsTotal);
+    if (this.selectionsTotal === this.maxSelectedCount) {
+      this.buttonDisabled = true;
+    }
+    this.initStar(); //初始化表格数据
+    this.searchTerm(); //初始化成长之星公示数据
   },
   methods: {
     //初始化界面的数据
     async initStar() {
-      const data = await initStar(this.onePageNumber);
-      this.tableData = data.data.tableData;
-      console.log(data.data);
-      this.classData = data.data.classData;
-      this.gradeData = data.data.gradeData;
-      this.hospitalData = data.data.hospitalData;
-      this.table = this.tableData;
-      this.selectedRowKey();
+      this.page = JSON.parse(localStorage.getItem("starPage"));
+      const data = await initStar(this.limit, this.page, this.search);
+      console.log(data, "data");
+      if (data.data !== null) {
+        this.tableData = data.data.tableData;
+        this.table = this.tableData;
+        this.total = data.data.total;
+        this.maxSelectedCount = data.data.peopleLimit;
+        this.buttonDisabled = data.data.isDisabled
+        this.search = "";
+        console.log(this.table, "table");
+        console.log(this.mul, "mul");
+        //显示已选中用户的选中状态
+        this.table.map((item, index) => {
+          const existingItem = this.mul.find(
+            (item1) => item1.username === item.username
+          );
+          if (existingItem) {
+            // console.log();
+            item.status = true;
+          }
+        });
+      }
+    },
+
+    //初始化下面成长之星公示的数据
+    async initPublic(data) {
+      if (data !== null) {
+        this.classData = data.data.classData;
+        this.gradeData = data.data.gradeData;
+        this.hospitalData = data.data.hospitalData;
+      }
+    },
+
+    //查找第几届成长之星
+    async searchTerm() {
+      console.log(this.term, "term");
+      if (this.term === null) {
+        this.term = 0;
+      }
+      const data = await termStar(this.term);
+      this.initPublic(data);
     },
 
     allCheck() {
       // 1. 获取当前复选框的选中状态
       this.isAll = !this.isAll;
 
-      if (this.table.length > 3) {
+      if (this.table.length > this.maxSelectedCount) {
         Message({
           message: "选择数目超过名额，无法选择！",
         });
@@ -212,19 +267,31 @@ export default {
       // this.$store.commit("star/setIsAll", this.isAll);
     },
 
+    //表示当前是多少页
+    handleCurrentChange(val) {
+      localStorage.setItem("starPage", val);
+      this.initStar();
+    },
+
     //获取到选中行的数据
-    handleSelectionChange(val, selected) {
+    async handleSelectionChange(val, selected) {
+      // const {data}= await selectStatus(val.username,selected)
+      // this.tableData = data;
       val.status = selected;
+      const existingItem = this.mul.find(
+        (item) => item.username === val.username
+      );
+      console.log(existingItem, "val");
       //判断用户是勾选还是取消勾选
-      if (!this.mul.includes(val)) {
+      if (!existingItem) {
         this.multipleSelection = val;
-        if (this.remainder > 0) {
+        if (this.mul.length < this.maxSelectedCount) {
           console.log(this.isAdd, "add");
           // 将这些新对象添加到mul数组中
           this.mul.push(this.multipleSelection);
           this.remainder = this.maxSelectedCount - this.mul.length;
           console.log(this.mul, "length");
-          if (this.mul.length === this.onePageNumber) {
+          if (this.mul.length === this.tableData.length) {
             this.isAll = true;
           }
           if (this.remainder === 0) {
@@ -244,41 +311,57 @@ export default {
       }
     },
 
-    //搜索要推选的人
-    async searchSelection() {
-      const data = await searchStar(this.onePageNumber, this.search);
-      this.tableData = data.data;
-      this.table = this.tableData
-      console.log(this.tableData);
-      this.search = ''
-    },
-
     //推选
     async electUsers() {
       if (this.mul.length === 0) {
         Message({
           message: "您还没有选择推选的人员",
         });
-      }else {
-        await elected(this.mul);
+      } else {
+        let userInfo = JSON.parse(localStorage.getItem("userInfo"));
+        let role = userInfo.role;
+        if (
+          role === "grade1" ||
+          role === "grade2" ||
+          role === "grade3" ||
+          role === "grade4"
+        ) {
+          role = "grade";
+        }
+        const data = await elected(this.mul, role);
+        if (data.msg !== "数据已存在") {
+          this.selectionsTotal = this.selectionsTotal + this.mul.length;
+          console.log(this.selectionsTotal, "max");
+          if (this.selectionsTotal > this.maxSelectedCount) {
+            Message({
+              message: "超出名额限制",
+            });
+          } else {
+            localStorage.setItem("selectionsTotal", this.selectionsTotal);
+            if (
+              JSON.parse(localStorage.getItem("selectionsTotal")) ===
+              this.maxSelectedCount
+            ) {
+              const username = userInfo.username;
+              await optional(username);
+              this.buttonDisabled = true;
+              Message({
+                message: "推选名额已经用完喽",
+              });
+            }
+          }
+        }
       }
+      this.mul = [];
       this.initStar();
-    },
-
-    //查找第几届成长之星
-    async searchTerm() {
-      console.log(this.term,'term');
-      await termStar(this.term)
     },
 
     //公布成长之星名单
     async publicStar() {
-      await publicStar();
-    },
-
-    //控制多选框是否能编辑
-    selectedRowKey() {
-      this.selectedRowKeys = JSON.parse(localStorage.getItem("id")) || [];
+      localStorage.setItem("selectionsTotal", 0);
+      this.buttonDisabled = false;
+      const data = await publicStar();
+      this.initPublic(data);
     },
 
     //重新选择
@@ -349,6 +432,11 @@ export default {
       border-left: 1px solid #95a575;
       border-right: 1px solid #95a575;
 
+      .empty {
+        height: 33px;
+        text-align: center;
+      }
+
       th,
       td {
         border-bottom: 1px solid #95a575;
@@ -383,6 +471,12 @@ export default {
 
       .middle-button {
         float: right;
+
+        .el-tooltip {
+          float: right;
+          height: 50px;
+          line-height: 50px;
+        }
       }
 
       .block {
