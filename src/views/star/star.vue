@@ -179,21 +179,12 @@ export default {
       page: 1, //表示当前在第几页
       // currentPageNumber:0,  //表示当前页数据的条数
       total: 0, //表格中总共有多少数据
-      selectionsTotal: 0, //表示已推选的人员总数
+      // selectionsTotal: 0, //表示已推选的人员总数
       buttonDisabled: false, //表示两个按钮是否被禁用
     };
   },
   async created() {
     localStorage.setItem("starPage", this.page);
-    if (localStorage.getItem("selectionsTotal")) {
-      this.selectionsTotal = JSON.parse(
-        localStorage.getItem("selectionsTotal")
-      );
-    }
-    localStorage.setItem("selectionsTotal", this.selectionsTotal);
-    if (this.selectionsTotal === this.maxSelectedCount) {
-      this.buttonDisabled = true;
-    }
     this.initStar(); //初始化表格数据
     this.searchTerm(); //初始化成长之星公示数据
   },
@@ -208,6 +199,7 @@ export default {
         this.table = this.tableData;
         this.total = data.data.total;
         this.maxSelectedCount = data.data.peopleLimit;
+        console.log(this.maxSelectedCount,'1111');       
         this.buttonDisabled = data.data.isDisabled
         this.search = "";
         console.log(this.table, "table");
@@ -330,35 +322,24 @@ export default {
         }
         const data = await elected(this.mul, role);
         if (data.msg !== "数据已存在") {
-          this.selectionsTotal = this.selectionsTotal + this.mul.length;
-          console.log(this.selectionsTotal, "max");
-          if (this.selectionsTotal > this.maxSelectedCount) {
-            Message({
-              message: "超出名额限制",
-            });
-          } else {
-            localStorage.setItem("selectionsTotal", this.selectionsTotal);
             if (
-              JSON.parse(localStorage.getItem("selectionsTotal")) ===
-              this.maxSelectedCount
+              data.data === 'No seats left'
             ) {
-              const username = userInfo.username;
-              await optional(username);
+              await optional();
               this.buttonDisabled = true;
               Message({
                 message: "推选名额已经用完喽",
               });
             }
-          }
         }
       }
       this.mul = [];
+      this.isAll = false
       this.initStar();
     },
 
     //公布成长之星名单
     async publicStar() {
-      localStorage.setItem("selectionsTotal", 0);
       this.buttonDisabled = false;
       const data = await publicStar();
       this.initPublic(data);

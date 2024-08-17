@@ -91,6 +91,7 @@
 import { getPicCode } from "../../api/login";
 import { login } from "../../api/login";
 import { Message } from "element-ui";
+import {EventBus } from '../../main'
 export default {
   name: "login",
   data() {
@@ -193,9 +194,6 @@ export default {
       console.log("Picture code fetched successfully");
     } catch (error) {
       console.error("Error in mounted hook:", error);
-    }
-    if(JSON.parse(localStorage.getItem('selectionsTotal'))){
-      localStorage.setItem('selectionsTotal',0)
     }
   },
 };

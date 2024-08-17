@@ -38,7 +38,7 @@ service.interceptors.response.use(
     // 2xx 范围内的状态码都会触发该函数。
     // 对响应数据做点什么 (默认axios会多包装一层data，需要响应拦截器中处理一下)
     const res = response.data
-    if (res.status !== 200 && res.msg !== null) {
+    if (res.status !== 200 && res.msg !== null && res.msg !== '操作成功') {
       // 给错误提示, Toast 默认是单例模式，后面的 Toast调用了，会将前一个 Toast 效果覆盖
       // 同时只能存在一个 Toast
       Message(res.msg)

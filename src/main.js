@@ -1,5 +1,4 @@
 import Vue from 'vue'
-
 import 'normalize.css/normalize.css'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
@@ -12,6 +11,7 @@ import './permission' // permission control
 import './debug' // 错误日志收集
 import '../static/icon/iconfont.css'
 // 在main.js或app.js中  
+
 
 Vue.use(ElementUI, {
   size: 'small' // default: medium

@@ -285,10 +285,10 @@
           :formatter="isManagerFormatter"
         >
           <template slot-scope="scope">
-            <el-tag type="danger" v-if="scope.row.managerType === ''"
+            <el-tag type="danger" v-if="scope.row.manager_type === '无'"
               >否</el-tag
             >
-            <el-tag type="success" v-else>{{ scope.row.managerType }}</el-tag>
+            <el-tag type="success" v-else>{{ scope.row.manager_type }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column
@@ -332,8 +332,9 @@
             >
               <span class="el-dropdown-link" style="cursor: pointer;"> 设为管理员 </span>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item command="class" >班级管理员</el-dropdown-item>
-                <el-dropdown-item command="grade">年级管理员</el-dropdown-item>
+                <el-dropdown-item command="班级管理员" >班级管理员</el-dropdown-item>
+                <el-dropdown-item command="年级管理员">年级管理员</el-dropdown-item>
+                <el-dropdown-item command="取消管理员">取消管理员</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </template>
@@ -601,13 +602,13 @@ export default {
     //设为管理员
     async setAdmin(command,row) {
       console.log(row, "command");
-      let managerType = "";
-      if (command === "class") {
-        managerType = "班级管理员";
-      } else {
-        managerType = "年级管理员";
-      }
-      await makeAdmin(row, managerType);
+      // let managerType = "";
+      // if (command === "class") {
+      //   managerType = "班级管理员";
+      // } else {
+      //   managerType = "年级管理员";
+      // }
+      await makeAdmin(row, command);
       this.init();
     },
 

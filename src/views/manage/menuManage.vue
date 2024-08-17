@@ -45,28 +45,28 @@
           <el-form-item
             label="路由名称"
             prop="routeName"
-            v-if="this.data.type === '菜单'"
+            v-if="this.data.type === 1"
           >
             <el-input v-model="data.routeName"></el-input>
           </el-form-item>
           <el-form-item
             label="路由路径"
             prop="routePath"
-            v-if="this.data.type !== '功能'"
+            v-if="this.data.type !== 2"
           >
             <el-input v-model="data.routePath"></el-input>
           </el-form-item>
           <el-form-item
             label="组件路径"
             prop="componentPath"
-            v-if="this.data.type === '菜单'"
+            v-if="this.data.type === 1"
           >
             <el-input placeholder="请输入组件路径" v-model="data.componentPath">
               <template slot="prepend">src/views</template>
               <template slot="append">.vue</template>
             </el-input>
           </el-form-item>
-          <el-form-item label="路由参数" v-if="this.data.type === '菜单'">
+          <el-form-item label="路由参数" v-if="this.data.type === 1">
             <el-button type="success" plain
               ><i class="el-icon-edit"></i>添加路由参数</el-button
             >
@@ -74,7 +74,7 @@
           <el-form-item
             label="显示状态"
             prop="isVisiable"
-            v-if="this.data.type !== '功能'"
+            v-if="this.data.type !== 2"
           >
             <el-radio-group v-model="data.isVisiable">
               <el-radio :label="1" >显示</el-radio>
@@ -89,10 +89,16 @@
               :max="10"
             ></el-input-number>
           </el-form-item>
-          <el-form-item label="跳转路由" v-if="this.data.type === '目录'">
+          <el-form-item label="跳转路由" v-if="this.data.type === 0">
             <el-input v-model="data.redirect"></el-input>
           </el-form-item>
-          <el-form-item label="权限标识" v-if="this.data.type === '功能'">
+          <el-form-item label="权限标识" v-if="this.data.type === 2">
+            <el-input v-model="data.permissions"></el-input>
+          </el-form-item>
+          <el-form-item label="接口路径" v-if="this.data.type === 2">
+            <el-input v-model="data.permissions"></el-input>
+          </el-form-item>
+          <el-form-item label="接口方法" v-if="this.data.type === 2">
             <el-input v-model="data.permissions"></el-input>
           </el-form-item>
 
@@ -194,6 +200,8 @@ export default {
           isVisiable: "显示",
           sort: "1",
           redirect: "1",
+          requestPath:'',
+          requestMethod:''
         },
       ],
       //用于接收新增菜单中的数据
