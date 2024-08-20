@@ -15,12 +15,12 @@ export const baseRoutes = [
     path: '/layout',
     component: ()=>import('../views/layout/index.vue'),
     meta: {
-      title: '首页',
+      title: '',
       isLogin: true    //是否需要登录      
     },
     children: [
       {
-        path: "/",
+        path: "desktop",
         name: "desktop",
         component: ()=>import('../views/desktop/index.vue'),
         meta: {
@@ -45,6 +45,7 @@ const router = new Router({
   base: process.env.BASE_URL,
   baseRoutes
 })
+
 
 export default router
 

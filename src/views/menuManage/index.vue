@@ -29,9 +29,14 @@
           label-width="100px"
           class="demo-ruleForm"
         >
-          <el-form-item label="父级菜单">
-            <el-select placeholder="请选择父级菜单" v-model="data.fatherMenu">
-            </el-select>
+          <el-form-item label="父级菜单"  v-if="this.data.type !== 0">
+            <el-cascader         
+              v-model="data.fatherMenu"
+              :options="options"
+              placeholder="请选择父级菜单"
+              :show-all-levels="false"
+              :props="{ checkStrictly: true }"
+            ></el-cascader>
           </el-form-item>
           <el-form-item label="菜单名称" prop="menuName">
             <el-input v-model="data.menuName"></el-input>
@@ -146,7 +151,23 @@
           prop="menuName"
         >
         </el-table-column>
-        <el-table-column label="类型" show-overflow-tooltip prop="type">
+        <el-table-column
+          label="类型"
+          show-overflow-tooltip
+          prop="type"
+          width="90"
+        >
+          <template slot-scope="scope">
+            <el-tag type="success" effect="dark" v-if="scope.row.type === 0"
+              >目录</el-tag
+            >
+            <el-tag type="danger" effect="dark" v-if="scope.row.type === 1"
+              >菜单</el-tag
+            >
+            <el-tag type="warning" effect="dark" v-if="scope.row.type === 2"
+              >按钮</el-tag
+            >
+          </template>
         </el-table-column>
         <el-table-column
           label="路由名称"
@@ -164,7 +185,6 @@
           prop="componentPath"
           label="组件路径"
           show-overflow-tooltip
-          width="240px"
         >
         </el-table-column>
         <el-table-column
@@ -173,18 +193,31 @@
           show-overflow-tooltip
         >
         </el-table-column>
-        <el-table-column
+        <!-- <el-table-column
           prop="redirect"
-          label="跳转路由"
+          label="重定向路由"
           show-overflow-tooltip
-        ></el-table-column>
-        <el-table-column label="状态" show-overflow-tooltip  :formatter="(row) => row.isVisible === 0 ? '隐藏' : '显示'">
-          <template  slot-scope="scope">
-            <el-tag v-if="scope.row.isVisible = 1" type="warning">显示</el-tag>
+        ></el-table-column> -->
+        <el-table-column
+          label="状态"
+          show-overflow-tooltip
+          width="90"
+          :formatter="(row) => (row.isVisible === 0 ? '隐藏' : '显示')"
+        >
+          <template slot-scope="scope">
+            <el-tag v-if="(scope.row.isVisible = 1)" type="warning"
+              >显示</el-tag
+            >
             <el-tag type="info" v-else>隐藏</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="排序" show-overflow-tooltip prop="sort">
+        <el-table-column
+          sortable
+          label="排序"
+          show-overflow-tooltip
+          prop="sort"
+          width="50"
+        >
         </el-table-column>
         <el-table-column
           fixed="right"
@@ -211,8 +244,10 @@ import { selectMenu } from "../../api/menuManage";
 import { addMenu } from "../../api/menuManage";
 import { editMenu } from "../../api/menuManage";
 import { deleteMenu } from "../../api/menuManage";
+import { fartherManuList } from "../../api/menuManage";
+import { initSidebar } from "../../api/sidebar";
 export default {
-  name:'menu',
+  name: "menu",
   data() {
     return {
       selectInput: "", //搜索框输入的内容
@@ -222,6 +257,9 @@ export default {
       newData: {}, //新增菜单的表格中的数据
       midData: {}, //编辑的侧边栏表格中的数据
       inputPairs: [], //存放新增的参数
+      options: [
+       
+      ], //放父菜单的所有选项
       //存放要往表格中渲染数据
       tableData: [
         {
@@ -238,7 +276,7 @@ export default {
           requestUrl: "",
           requestMethod: "",
           params: [],
-          icon:''
+          icon: "",
         },
       ],
       // //用于接收新增菜单中的数据
@@ -279,7 +317,12 @@ export default {
       },
     };
   },
-  async mounted() {
+  async beforeCreate(){
+    const {data} = await fartherManuList()
+    this.options = data
+    console.log(this.options, "option");
+  },
+  async created() {
     this.init();
   },
   methods: {
@@ -317,8 +360,12 @@ export default {
 
     //搜索操作
     async select() {
+      // debugger
       const data = await selectMenu(this.selectInput);
+      console.log(11111111);
+
       this.tableData = data.data;
+      console.log(this.tableData, "table");
     },
     //重置表格中的数据操作
     reset() {
@@ -327,7 +374,7 @@ export default {
     },
 
     //点击新建菜单
-    addMenu() {
+    async addMenu() {
       this.inputPairs = [];
       this.data = this.newData;
       this.isAdd = true;
@@ -339,17 +386,19 @@ export default {
       console.log(this.inputPairs, "row");
       if (this.isAdd) {
         this.data.params = this.inputPairs;
+        this.data.fatherMenu = this.data.fatherMenu[this.data.fatherMenu.length-1]
         console.log(this.data, "111");
         await addMenu(this.data);
       } else {
         await editMenu(this.data);
       }
       this.init();
+      this.drawer = false
     },
 
     //删除操作
     async handleClick(row) {
-      const data = await deleteMenu(row.menuName);
+      await deleteMenu(row.id);
       this.init();
     },
 

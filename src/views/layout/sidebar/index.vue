@@ -26,7 +26,24 @@ export default {
       console.log("Selected menu:", index);
     },
     async init() {
-      this.sidebarData = this.$store.state.menu.dyMenuList
+      const initData = await initSidebar();
+      const data = initData.data;
+      console.log(data, "&&&&");
+      const result = [];
+      const map = new Map();
+      for (const item of data) {
+        map.set(item.id, { ...item, children: [] });
+      }
+
+      for (const item of data) {
+        if (item.parentId !== null && map.has(item.parentId)) {
+          map.get(item.parentId).children.push(map.get(item.id));
+        } else {
+          result.push(map.get(item.id));
+        }
+      }
+      this.sidebarData = result;
+      console.log(this.sidebarData, "sidebarData");
     },
   },
 };

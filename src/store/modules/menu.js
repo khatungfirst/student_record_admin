@@ -27,6 +27,8 @@ const menuVuex = {
         //定义请求动态路由信息的接口方法
         async getMenuList(state) {
             let res = await initSidebar()
+            console.log(res.data,'res');
+            
             const data = res.data
             const result = [];
             const map = new Map();

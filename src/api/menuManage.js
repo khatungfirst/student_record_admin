@@ -5,28 +5,46 @@ export const initMenu = () => {
     return request.get('/menuManage/init')
 }
 //2、搜索
-export const selectMenu = (selectInput) => {
-    return request.get(`/menuManage/selectInfo?${selectInput}`)
+export const selectMenu = (input) => {
+    return request.get('/menuManage/selectInfo',
+        {
+            params: { input }
+        }
+    )
 }
 
 //3、新增菜单
 export const addMenu = (ruleForm) => {
-    return request.post('/menuManage/newelyBuilt',{
-        ruleForm
-    })
+    return request.post('/menuManage/newelyBuilt', JSON.stringify(ruleForm), {
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    }
+    )
 }
 
 //4、编辑菜单
 export const editMenu = (ruleForm) => {
-    return request.post('/menuManage/edit',{
-        ruleForm
-    })
+    return request.post('/menuManage/edit', JSON.stringify(ruleForm), {
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    }
+    )
 
 }
 
 //5、删除菜单
-export const deleteMenu = (menuName) => {
-    return request.post('/menuManage/delete',{
-        menuName
-    })
+export const deleteMenu = (menuId) => {
+    return request.post('/menuManage/delete', JSON.stringify({ menuId }),
+        {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+}
+
+//6、获取父级菜单下拉列表中的数据
+export const fartherManuList = () => {
+    return request.get('/menuManage/list')
 }

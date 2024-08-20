@@ -3,7 +3,7 @@
     <i class="iconfont" style="font-size: 20px">&#xe603;</i>
     教育管理系统
     <div class="header-right">
-      <el-avatar style="width: 30px;height:30px;" src=""></el-avatar>
+      <el-avatar style="width: 30px;height:30px;" :src="avatar"></el-avatar>
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
           管理员：<span></span> <i class="el-icon-caret-bottom"></i>
@@ -22,16 +22,27 @@
 </template>
 
 <script>
+import {getDetailInfo} from '@/api/userInfo'
 export default {
   name: "AppHeader",
   data() {
-    return {};
+    return {
+      //头像
+      avatar:""
+    };
+  },
+  mounted(){
+    this.init()
   },
   methods: {
     logout() {
-      this.$store.dispatch("user/LogOut")
+      // this.$store.dispatch("user/LogOut")
       this.$router.push('/login')
     },
+    async init(){
+      const data = await getDetailInfo()
+      this.avatar = data.data.avatar
+    }
   },
 };
 </script>
