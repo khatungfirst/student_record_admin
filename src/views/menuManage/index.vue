@@ -25,12 +25,13 @@
         <el-form
           :rules="rules"
           :model="data"
-          ref="ruleForm"
+          ref="data"
           label-width="100px"
           class="demo-ruleForm"
         >
           <el-form-item label="父级菜单">
-            <el-select placeholder="请选择父级菜单"> </el-select>
+            <el-select placeholder="请选择父级菜单" v-model="data.fatherMenu">
+            </el-select>
           </el-form-item>
           <el-form-item label="菜单名称" prop="menuName">
             <el-input v-model="data.menuName"></el-input>
@@ -67,17 +68,37 @@
             </el-input>
           </el-form-item>
           <el-form-item label="路由参数" v-if="this.data.type === 1">
-            <el-button type="success" plain
+            <el-button type="success" plain @click="addInputPair"
               ><i class="el-icon-edit"></i>添加路由参数</el-button
             >
+            <div
+              v-for="(pair, index) in inputPairs"
+              :key="index"
+              class="paramBox"
+            >
+              <input
+                type="text"
+                placeholder="参数名"
+                v-model="pair.paramsKey"
+              />-
+              <input
+                type="text"
+                placeholder="参数值"
+                v-model="pair.paramsValue"
+              />
+              <i @click="removeInputPair(index)" class="el-icon-delete"></i>
+            </div>
+          </el-form-item>
+          <el-form-item label="icon" v-if="this.data.type !== 2">
+            <el-input v-model="data.icon"></el-input>
           </el-form-item>
           <el-form-item
             label="显示状态"
-            prop="isVisiable"
+            prop="isVisible"
             v-if="this.data.type !== 2"
           >
-            <el-radio-group v-model="data.isVisiable">
-              <el-radio :label="1" >显示</el-radio>
+            <el-radio-group v-model="data.isVisible">
+              <el-radio :label="1">显示</el-radio>
               <el-radio :label="0">隐藏</el-radio>
             </el-radio-group>
           </el-form-item>
@@ -96,21 +117,28 @@
             <el-input v-model="data.permissions"></el-input>
           </el-form-item>
           <el-form-item label="接口路径" v-if="this.data.type === 2">
-            <el-input v-model="data.permissions"></el-input>
+            <el-input v-model="data.requestUrl"></el-input>
           </el-form-item>
           <el-form-item label="接口方法" v-if="this.data.type === 2">
-            <el-input v-model="data.permissions"></el-input>
+            <el-input v-model="data.requestMethod"></el-input>
           </el-form-item>
 
           <el-form-item>
             <el-button type="primary" @click="newlyBuilt">确定</el-button>
-            <el-button @click="resetForm('ruleForm')">取消</el-button>
+            <el-button @click="resetForm('data')">取消</el-button>
           </el-form-item>
         </el-form>
       </el-drawer>
     </div>
     <div class="bottom">
-      <el-table :data="tableData" border style="width: 100%">
+      <el-table
+        :data="tableData"
+        style="width: 100%; margin-bottom: 20px"
+        row-key="id"
+        border
+        default-expand-all
+        :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+      >
         <el-table-column
           fixed
           label="菜单名称"
@@ -150,7 +178,11 @@
           label="跳转路由"
           show-overflow-tooltip
         ></el-table-column>
-        <el-table-column label="状态" show-overflow-tooltip prop="isVisiable">
+        <el-table-column label="状态" show-overflow-tooltip  :formatter="(row) => row.isVisible === 0 ? '隐藏' : '显示'">
+          <template  slot-scope="scope">
+            <el-tag v-if="scope.row.isVisible = 1" type="warning">显示</el-tag>
+            <el-tag type="info" v-else>隐藏</el-tag>
+          </template>
         </el-table-column>
         <el-table-column label="排序" show-overflow-tooltip prop="sort">
         </el-table-column>
@@ -180,44 +212,51 @@ import { addMenu } from "../../api/menuManage";
 import { editMenu } from "../../api/menuManage";
 import { deleteMenu } from "../../api/menuManage";
 export default {
+  name:'menu',
   data() {
     return {
       selectInput: "", //搜索框输入的内容
       drawer: false, //控制侧边栏的出现与否
-      isAdd: false,  //判断是新增还是编辑
+      isAdd: false, //判断是新增还是编辑
       data: {}, //最终获取的数据
       newData: {}, //新增菜单的表格中的数据
       midData: {}, //编辑的侧边栏表格中的数据
+      inputPairs: [], //存放新增的参数
       //存放要往表格中渲染数据
       tableData: [
         {
+          fatherMenu: "",
           menuName: "1",
           type: 1,
           routeName: "3",
           routePath: "4",
           componentPath: "5",
           permissions: "6",
-          isVisiable: "显示",
+          isVisible: "显示",
           sort: "1",
           redirect: "1",
-          requestPath:'',
-          requestMethod:''
+          requestUrl: "",
+          requestMethod: "",
+          params: [],
+          icon:''
         },
       ],
-      //用于接收新增菜单中的数据
-      ruleForm: {
-        fatherMenu: "",
-        menuName: "",
-        type: "目录",
-        routeName: "",
-        routePath: "",
-        route: [],
-        componentPath: "",
-        isVisiable: 0,
-        sort: 1,
-        redirect: "",
-        permissions: "",
-      },
+      // //用于接收新增菜单中的数据
+      // ruleForm: {
+      //   fatherMenu: "",
+      //   menuName: "",
+      //   type: "目录",
+      //   routeName: "",
+      //   routePath: "",
+      //   params: [],
+      //   componentPath: "",
+      //   isVisible: 0,
+      //   sort: 1,
+      //   redirect: "",
+      //   permissions: "",
+      //   requestUrl: "",
+      //   requestMethod: "",
+      // },
       //新增菜单表单中的规范
       rules: {
         menuName: [
@@ -236,12 +275,12 @@ export default {
         componentPath: [
           { required: true, message: "请填写组件路径", trigger: "blur" },
         ],
-        isVisiable: [{ required: true }],
+        isVisible: [{ required: true }],
       },
     };
   },
   async mounted() {
-    this.init()
+    this.init();
   },
   methods: {
     //初始化数据
@@ -249,6 +288,7 @@ export default {
       const data = await initMenu();
       this.tableData = data.data;
     },
+
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
@@ -259,18 +299,21 @@ export default {
         }
       });
     },
+
     ///重置新建菜单的表单
     resetForm(formName) {
       this.$refs[formName].resetFields();
     },
-    // // 关闭侧边栏操作
-    // handleClose(done) {
-    //   this.$confirm("确认关闭？")
-    //     .then((_) => {
-    //       done();
-    //     })
-    //     .catch((_) => {});
-    // },
+
+    //新增参数
+    addInputPair() {
+      this.inputPairs.push({ paramsKey: "", paramsValue: "" });
+    },
+
+    //删除参数
+    removeInputPair(index) {
+      this.inputPairs.splice(index, 1);
+    },
 
     //搜索操作
     async select() {
@@ -280,26 +323,26 @@ export default {
     //重置表格中的数据操作
     reset() {
       this.selectInput = "";
-      this.init(                   )
+      this.init();
     },
 
     //点击新建菜单
     addMenu() {
+      this.inputPairs = [];
       this.data = this.newData;
       this.isAdd = true;
       this.drawer = true;
     },
 
     //新建/编辑的确定操作
-    async newlyBuilt(row) {
-      console.log(row, "row");
-
+    async newlyBuilt() {
+      console.log(this.inputPairs, "row");
       if (this.isAdd) {
-        console.log("111");
-        await addMenu(this.ruleForm);
+        this.data.params = this.inputPairs;
+        console.log(this.data, "111");
+        await addMenu(this.data);
       } else {
-        console.log(row, "222");
-        await editMenu(this.ruleForm);
+        await editMenu(this.data);
       }
       this.init();
     },
@@ -313,9 +356,9 @@ export default {
     //编辑操作
     edit(row) {
       this.drawer = true;
-      this.midData = row;
-      this.data = this.midData;
-      console.log(this.data,'1111111111');
+      // this.midData = row;
+      this.data = row;
+      console.log(this.data, "1111111111");
       console.log(row);
     },
   },
@@ -336,6 +379,24 @@ export default {
   .demo-ruleForm {
     .el-select .el-input {
       width: 130px;
+    }
+
+    .paramBox {
+      margin-top: 10px;
+      input {
+        width: 120px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 6px 12px;
+        font-size: 14px;
+        outline: none;
+        margin-right: 5px;
+      }
+
+      input:focus {
+        border-color: #66afe9;
+        box-shadow: none;
+      }
     }
     .input-with-select .el-input-group__prepend {
       background-color: #fff;

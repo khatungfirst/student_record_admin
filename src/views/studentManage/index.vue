@@ -367,6 +367,7 @@ import { exportData } from "../../api/manageStudents";
 import { studentInfo } from "../../api/manageStudents";
 import { pageData } from "../../api/manageStudents";
 export default {
+  name:'studentmanage',
   data() {
     return {
       //用于接收后端传来的下拉框中的选项

@@ -10,7 +10,7 @@
         <app-main></app-main>
       </div>
     </div>
-  </div>
+</div>
 </template>
 
 <script>
@@ -23,6 +23,7 @@
     name: 'layout',
     data() {
       return {
+        
       }
     },
     components: {

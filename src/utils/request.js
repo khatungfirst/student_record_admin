@@ -25,6 +25,7 @@ service.interceptors.request.use(config => {
   
   if (localStorage.getItem('token')) {
     config.headers['token'] = getToken()
+    // config.headers['token'] = localStorage.getItem('token')
   }
   
   return config

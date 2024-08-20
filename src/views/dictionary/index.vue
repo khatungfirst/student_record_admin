@@ -52,6 +52,7 @@
 </template>
 <script>
 export default {
+  name:'dictionary',
   data() {
     return {
       //存放表格中的数据

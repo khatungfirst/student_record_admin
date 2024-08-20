@@ -6,6 +6,7 @@ import user from './modules/user'
 import permission from './modules/permission'
 import getters from './getters'
 import star from './modules/star'
+import menu from './modules/menu'
 
 Vue.use(Vuex)
 
@@ -14,9 +15,12 @@ const store = new Vuex.Store({
     app,
     user,
     permission,
-    star
+    star,
+    menu
   },
   getters
 })
 
 export default store
+
+

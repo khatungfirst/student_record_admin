@@ -160,6 +160,7 @@ import { elected } from "../../api/star";
 import { publicStar } from "../../api/star";
 import { termStar } from "../../api/star";
 export default {
+  name:'star',
   data() {
     return {
       search: "", //存放搜索框中的内容

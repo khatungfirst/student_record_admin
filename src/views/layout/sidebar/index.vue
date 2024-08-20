@@ -1,55 +1,33 @@
-
 <template>
-  <el-menu mode="vertical"
-           :default-active="isSamePath"
-           :collapse="isCollapse"
-           :default-openeds="openeds"
-           @open="menuOpen"
-           active-text-color="#409EFF">
-    <sidebar-item v-for="route in permission_routers"
-                  :key="route.name"
-                  :item="route"
-                  :base-path="route.path"></sidebar-item>
-  </el-menu>
+  <side-menu
+    :menu-list="sidebarData"
+    @menu-select="handleMenuSelect"
+  ></side-menu>
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import SidebarItem from './sidebarItem'
+import SideMenu from "./sidebarItem.vue";
+import { initSidebar } from "../../../api/sidebar";
 
-  export default {
-    components: { SidebarItem },
-    data() {
-      return {
-        openeds: ['/examples']
-      }
+export default {
+  components: {
+    SideMenu,
+  },
+  data() {
+    return {
+      sidebarData: [],
+    };
+  },
+  created() {
+    this.init();
+  },
+  methods: {
+    handleMenuSelect(index) {
+      console.log("Selected menu:", index);
     },
-    computed: {
-      ...mapGetters([
-        'permission_routers',
-        'sidebar'
-      ]),
-      isSamePath() {
-        const idx = this.$route.path.indexOf('/list')
-        if (idx > 0) {
-          return this.$route.path.substr(0, idx)
-        }
-        return this.$route.path
-      },
-      isCollapse() {
-        return !this.sidebar.opened
-      }
+    async init() {
+      this.sidebarData = this.$store.state.menu.dyMenuList
     },
-    methods: {
-      menuOpen(idx) {
-        if (this.openeds.indexOf(idx) < 0) {
-          this.openeds.push(idx)
-        }
-      }
-    }/*,
-    mounted() {
-      console.log('permission_routers', this.permission_routers)
-      console.log('path', this.$route.path)
-    }*/
-  }
+  },
+};
 </script>

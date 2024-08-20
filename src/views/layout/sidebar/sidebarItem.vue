@@ -1,62 +1,110 @@
 <template>
-  <el-submenu v-if="!item.hidden" :index="item.path">
+  <el-menu
+    :default-active="activeMenu"
+    @select="handleMenuSelect"
+    :unique-opened="true"
+    :router="true"
+  >
+    <!-- <div v-for="item in menuList" :key="item.id">
+      <el-submenu
+        v-if="item.children && item.children.length > 0"
+        :index="item.path"
+      >
+        <template slot="title">
+          <i :class="item.meta.icon"></i>
+          <span>{{ item.meta.name }}</span>
+        </template>
+        <side-menu :menu-list="item.children"></side-menu>
+      </el-submenu>
+      <el-menu-item v-else :index="item.routePath" :to="item.routePath">
+        <i :class="item.meta.icon"></i>
+        <span slot="title">{{ item.meta.name }}</span>
+      </el-menu-item>
+    </div> -->
 
-    <template slot="title">
-      <i v-if="item.meta && item.meta.icon" :class="item.meta.icon" style="margin-right:0;"></i>
-      <span v-if="item.meta && item.meta.title" slot="title">{{item.meta.title}}</span>
-    </template>
+    <!-- 对items进行遍历 -->
+    <template v-for="item in menuList">
+        <!-- 使用v-if判定是否具有第二级菜单 -->
+        <template v-if="item.children">
+          <el-submenu :index="item.path" :key="item.path" >
+            <template slot="title">
+              <i :class="item.icon"></i>
+              <!-- 如果存在第二级菜单，渲染第一级菜单标题 -->
+              <span slot="title">{{ item.title }}</span>
+            </template>
+            <!-- 遍历第二级菜单 -->
+            <template v-for="subItem in item.children">
+              <!-- 判定是否具有第三级菜单 -->
+              <el-submenu
+                v-if="subItem.children"
+                :index="subItem.path"
+                :key="subItem.path"
+              >
+                <!-- 如果存在第三级菜单，渲染第二级菜单标题 -->
+                <template slot="title">{{ subItem.title }}</template>
+                <!-- 遍历第三级菜单，并渲染第三级菜单标题 -->
+                <el-menu-item
+                  v-for="(threeItem, i) in subItem.children"
+                  :key="i"
+                  :index="threeItem.path"
+                  >{{ threeItem.title }}</el-menu-item
+                >
+              </el-submenu>
 
-    <template v-if="!child.hidden" v-for="child in item.children">
-      <router-link :to="resolvePath(child.path)" :key="child.name">
-        <el-menu-item style="padding-left:48px;" :index="resolvePath(child.path)">
-          <!--i class="el-icon-arrow-right"></i-->
-          <span v-if="child.meta && child.meta.title"
-                slot="title">{{child.meta.title}}</span>
-        </el-menu-item>
-      </router-link>
-    </template>
+              <!-- 如果不存在第三级菜单，渲染第二级菜单标题 -->
+              <el-menu-item
+                v-else
+                :index="subItem.path"
+                :key="subItem.path"
+                >{{ subItem.title }}</el-menu-item
+              >
+            </template>
+          </el-submenu>
+        </template>
+        <!-- 如果不存在第二级菜单，渲染第一级菜单标题 -->
+        <template v-else>
+          <el-menu-item :index="item.path" :key="item.path">
+            <i :class="item.icon"></i>
+            <span slot="title">{{ item.title }}</span>
+          </el-menu-item>
+        </template>
+      </template>
+  </el-menu>
 
-  </el-submenu>
+  
 </template>
 
 <script>
-  import path from 'path'
+export default {
+  name: "SideMenu",
+  props: {
+    menuList: {
+      type: Array,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      activeMenu: "",
+    };
+  },
+  methods: {
+    handleMenuSelect(val) {
+      this.activeMenu = val;
+      console.log(val, "val");
 
-  export default {
-    name: 'SidebarItem',
-    props: {
-      item: {
-        type: Object,
-        required: true
-      },
-      isNest: {
-        type: Boolean,
-        default: false
-      },
-      basePath: {
-        type: String,
-        default: ''
-      }
+      // this.push
     },
-    data() {
-      return {
-        onlyOneChild: null
-      }
-    },
-    methods: {
-      resolvePath(...paths) {
-        return path.resolve(this.basePath, ...paths)
-      }
-    }
-  }
+  },
+};
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-  .nest-menu .el-submenu > .el-submenu__title,
-  .el-submenu .el-menu-item {
-    min-width: 179px!important;
-  }
-  .el-menu--collapse .el-menu .el-submenu{
-    min-width: 180px!important;
-  }
+.nest-menu .el-submenu > .el-submenu__title,
+.el-submenu .el-menu-item {
+  min-width: 179px !important;
+}
+.el-menu--collapse .el-menu .el-submenu {
+  min-width: 180px !important;
+}
 </style>
