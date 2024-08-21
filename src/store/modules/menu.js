@@ -46,7 +46,7 @@ const menuVuex = {
             let myMenu = ruleMenu(menuOther, res.data)
             state.commit('setMenu', myMenu)
             let mybaseRoutes = cloneDeep(baseRoutes)
-            mybaseRoutes[1].children.push(...myMenu)
+            mybaseRoutes[0].children.push(...myMenu)
 
             return mybaseRoutes
 

@@ -15,6 +15,7 @@
         style="background-color: #fc5430; color: aliceblue"
         @click="addMenu"
         type="primary"
+        v-permission
         ><i class="el-icon-plus"></i>新建菜单</el-button
       >
       <el-drawer
@@ -29,8 +30,8 @@
           label-width="100px"
           class="demo-ruleForm"
         >
-          <el-form-item label="父级菜单"  v-if="this.data.type !== 0">
-            <el-cascader         
+          <el-form-item label="父级菜单" v-if="this.data.type !== 0">
+            <el-cascader
               v-model="data.fatherMenu"
               :options="options"
               placeholder="请选择父级菜单"
@@ -42,7 +43,7 @@
             <el-input v-model="data.menuName"></el-input>
           </el-form-item>
           <el-form-item label="菜单类型" prop="type">
-            <el-radio-group v-model="data.type">
+            <el-radio-group v-model="data.type" @input="changeType">
               <el-radio :label="0">目录</el-radio>
               <el-radio :label="1">菜单</el-radio>
               <el-radio :label="2">按钮</el-radio>
@@ -130,7 +131,7 @@
 
           <el-form-item>
             <el-button type="primary" @click="newlyBuilt">确定</el-button>
-            <el-button @click="resetForm('data')">取消</el-button>
+            <el-button @click="resetForm">取消</el-button>
           </el-form-item>
         </el-form>
       </el-drawer>
@@ -254,12 +255,10 @@ export default {
       drawer: false, //控制侧边栏的出现与否
       isAdd: false, //判断是新增还是编辑
       data: {}, //最终获取的数据
-      newData: {}, //新增菜单的表格中的数据
+      // newData: {}, //新增菜单的表格中的数据
       midData: {}, //编辑的侧边栏表格中的数据
       inputPairs: [], //存放新增的参数
-      options: [
-       
-      ], //放父菜单的所有选项
+      options: [], //放父菜单的所有选项
       //存放要往表格中渲染数据
       tableData: [
         {
@@ -280,29 +279,29 @@ export default {
         },
       ],
       // //用于接收新增菜单中的数据
-      // ruleForm: {
-      //   fatherMenu: "",
-      //   menuName: "",
-      //   type: "目录",
-      //   routeName: "",
-      //   routePath: "",
-      //   params: [],
-      //   componentPath: "",
-      //   isVisible: 0,
-      //   sort: 1,
-      //   redirect: "",
-      //   permissions: "",
-      //   requestUrl: "",
-      //   requestMethod: "",
-      // },
+      ruleForm: {
+        fatherMenu: "",
+        menuName: "",
+        type: 1,
+        routeName: "",
+        routePath: "",
+        params: [],
+        componentPath: "",
+        isVisible: 1,
+        sort: 1,
+        redirect: "",
+        permissions: "",
+        requestUrl: "",
+        requestMethod: "",
+      },
       //新增菜单表单中的规范
       rules: {
         menuName: [
           { required: true, message: "请输入菜单名称", trigger: "blur" },
         ],
-        // fatherName: [
-        //   { required: true, message: "请选择父级菜单", trigger: "change" },
-        // ],
+        fatherName: [
+          { required: true, message: "请选择父级菜单", trigger: "change" },
+        ],
         type: [{ required: true }],
         routeName: [
           { required: true, message: "请填写路由名称", trigger: "blur" },
@@ -317,9 +316,9 @@ export default {
       },
     };
   },
-  async beforeCreate(){
-    const {data} = await fartherManuList()
-    this.options = data
+  async beforeCreate() {
+    const { data } = await fartherManuList();
+    this.options = data;
     console.log(this.options, "option");
   },
   async created() {
@@ -344,8 +343,9 @@ export default {
     },
 
     ///重置新建菜单的表单
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
+    resetForm() {
+      this.$refs.data.resetFields();
+      this.drawer = false;
     },
 
     //新增参数
@@ -376,7 +376,7 @@ export default {
     //点击新建菜单
     async addMenu() {
       this.inputPairs = [];
-      this.data = this.newData;
+      this.data = this.ruleForm;
       this.isAdd = true;
       this.drawer = true;
     },
@@ -386,14 +386,15 @@ export default {
       console.log(this.inputPairs, "row");
       if (this.isAdd) {
         this.data.params = this.inputPairs;
-        this.data.fatherMenu = this.data.fatherMenu[this.data.fatherMenu.length-1]
+        this.data.fatherMenu =
+          this.data.fatherMenu[this.data.fatherMenu.length - 1];
         console.log(this.data, "111");
         await addMenu(this.data);
       } else {
         await editMenu(this.data);
       }
       this.init();
-      this.drawer = false
+      this.drawer = false;
     },
 
     //删除操作
@@ -407,8 +408,15 @@ export default {
       this.drawer = true;
       // this.midData = row;
       this.data = row;
-      console.log(this.data, "1111111111");
       console.log(row);
+    },
+
+    //切换类型单选框时触发的事件
+    changeType(newValue) {
+      console.log("change");
+      for (let prop in this.ruleForm) {
+        this.ruleForm[prop] = null;
+      }
     },
   },
 };

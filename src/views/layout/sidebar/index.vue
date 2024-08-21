@@ -1,30 +1,78 @@
 <template>
-  <side-menu
-    :menu-list="sidebarData"
-    @menu-select="handleMenuSelect"
-  ></side-menu>
+  <el-menu :default-active="activeMenu" :unique-opened="true">
+    <!-- 对items进行遍历 -->
+    <template v-for="item in sidebarData">
+      <!-- 使用v-if判定是否具有第二级菜单 -->
+      <template v-if="item.children && item.children.length > 0">
+        <el-submenu :key="item.id" :index="item.id.toString()">
+          <template slot="title">
+            <i :class="item.meta.icon"></i>
+            <!-- 如果存在第二级菜单，渲染第一级菜单标题 -->
+            <span slot="title">{{ item.meta.title }}</span>
+          </template>
+          <!-- 遍历第二级菜单 -->
+          <template v-for="subItem in item.children">
+            <!-- 判定是否具有第三级菜单 -->
+            <el-submenu
+              v-if="subItem.children && subItem.children.length > 0"
+              :key="subItem.id"
+              :index="subItem.id.toString()"
+            >
+              <i :class="subItem.meta.icon"></i>
+              <!-- 如果存在第三级菜单，渲染第二级菜单标题 -->
+              <template slot="title">{{ subItem.meta.title }}</template>
+              <!-- 遍历第三级菜单，并渲染第三级菜单标题 -->
+              <el-menu-item
+                v-for="(threeItem, i) in subItem.children"
+                :key="i"
+                :index="threeItem.id.toString()"
+                @click="handleMenuSelect(threeItem.component)"
+                >{{ threeItem.meta.title }}</el-menu-item
+              >
+            </el-submenu>
+
+            <!-- 如果不存在第三级菜单，渲染第二级菜单标题 -->
+            <el-menu-item
+              :key="subItem.id"
+              :index="subItem.id.toString()"
+              @click="handleMenuSelect(subItem.component)"
+              v-else
+            >
+              <i :class="subItem.meta.icon"></i
+              >{{ subItem.meta.title }}</el-menu-item
+            >
+          </template>
+        </el-submenu>
+      </template>
+      <!-- 如果不存在第二级菜单，渲染第一级菜单标题 -->
+      <template v-else>
+        <el-menu-item @click="handleMenuSelect(item.component)" :key="item.id" :index="item.id.toString()">
+          <i :class="item.meta.icon"></i>
+          <span slot="title">{{ item.meta.title }}</span>
+        </el-menu-item>
+      </template>
+    </template>
+  </el-menu>
 </template>
 
 <script>
-import SideMenu from "./sidebarItem.vue";
+// import SideMenu from "./sidebarItem.vue";
 import { initSidebar } from "../../../api/sidebar";
 
 export default {
-  components: {
-    SideMenu,
-  },
+  // components: {
+  //   SideMenu,
+  // },
   data() {
     return {
       sidebarData: [],
+      activeMenu: "",
     };
   },
   created() {
     this.init();
   },
   methods: {
-    handleMenuSelect(index) {
-      console.log("Selected menu:", index);
-    },
     async init() {
       const initData = await initSidebar();
       const data = initData.data;
@@ -43,8 +91,23 @@ export default {
         }
       }
       this.sidebarData = result;
-      console.log(this.sidebarData, "sidebarData");
+      console.log(this.sidebarData, "sidebarData111");
+    },
+    handleMenuSelect(val) {
+      // debugger;
+      this.$router.push(`/layout/${val}`);
+      console.log(val, "val");
+      this.activeMenu = val;
     },
   },
 };
 </script>
+<style rel="stylesheet/scss" lang="scss" scoped>
+.nest-menu .el-submenu > .el-submenu__title,
+.el-submenu .el-menu-item {
+  min-width: 179px !important;
+}
+.el-menu--collapse .el-menu .el-submenu {
+  min-width: 180px !important;
+}
+</style>

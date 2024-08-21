@@ -4,7 +4,7 @@ import request from '../utils/request'
 //1、获取表格中需要渲染的数据以及入学年份、班级下拉框选项中的数据
 export const studentInfo = (initInfo, role) => {
     console.log(JSON.stringify(initInfo), "initInfo")
-    return request.post(`/stuManage/queryStudent/${role}`, JSON.stringify(initInfo), {
+    return request.post(`/stuManage/queryStudent`, JSON.stringify(initInfo), {
         headers: {
             'Content-Type': 'application/json'
         },
