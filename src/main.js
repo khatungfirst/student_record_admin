@@ -30,6 +30,7 @@ Vue.directive('permission', {
     // console.log(binding.value,'binding');
 
     //判断points中是否包含v-permission=“表达式” 表达式的值
+    // 131
     if (!points.includes(binding.value)) {
       //禁用或者删除
       if (binding.value === 'topic:day:query' || binding.value === 'user:student:query' || binding.value === 'user:student:ban' || binding.value === 'user:teacher:query' || binding.value === 'user:teacher:ban' || binding.value === 'right:menu:query' || binding.value === 'article:query' || binding.value === 'star:user:query') {
