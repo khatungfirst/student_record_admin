@@ -49,5 +49,19 @@ export const menuOther = [
             title:'系统设置'
         }
     },
+    {
+        path: 'teacherManagement',
+        component: () => import('../views/teacherManage/index.vue'),
+        meta:{
+            title:'老师管理'
+        }
+    },
+    {
+        path: 'rolemanagement',
+        component: () => import('../views/rolemanagement/index.vue'),
+        meta:{
+            title:'角色管理'
+        }
+    },
 
 ]

@@ -1,5 +1,10 @@
 <template>
   <header class="app-header">
+    <div class="collapse-btn" @click="collapseChange">
+      <!-- 通过v-if和v-else来控制折叠按钮的状态 -->
+      <i v-if="!collapse" class="el-icon-s-fold" style="font-size: 22px;margin-right: 10px;" ></i>
+      <i v-else class="el-icon-s-unfold" style="font-size: 22px;margin-right: 10px;" ></i>
+    </div>
     <i class="iconfont" style="font-size: 20px">&#xe603;</i>
     教育管理系统
     <div class="header-right">
@@ -22,13 +27,16 @@
 </template>
 
 <script>
+import bus from '@/utils/bus'
 import {getDetailInfo} from '@/api/userInfo'
 export default {
   name: "AppHeader",
   data() {
     return {
       //头像
-      avatar:""
+      avatar:"",
+      //折叠栏初始状态
+      collapse: false,
     };
   },
   mounted(){
@@ -43,7 +51,13 @@ export default {
       const data = await getDetailInfo()
       this.avatar = data.data.avatar
       this.$store.dispatch('user/permissionInto',data.data.perms)
-    }
+    },
+     //设置侧边栏折叠事件对应的方法
+     collapseChange() {
+      this.collapse = !this.collapse;
+      //通过bus发送消息
+      bus.$emit("collapse", this.collapse);
+    },
   },
 };
 </script>
@@ -60,6 +74,10 @@ export default {
   width: 100%;
   padding-left: 20px;
   color: #fff;
+
+  .collapse-btn {
+    display: inline-block;
+  }
 
   .header-logo {
     display: inline-block;
