@@ -1,5 +1,5 @@
 <template>
-  <el-menu :default-active="activeMenu" :unique-opened="true">
+  <el-menu :default-active="activeMenu" :unique-opened="true" :collapse="collapse">
     <!-- 对items进行遍历 -->
     <template v-for="item in sidebarData">
       <!-- 使用v-if判定是否具有第二级菜单 -->
@@ -58,6 +58,7 @@
 <script>
 // import SideMenu from "./sidebarItem.vue";
 import { initSidebar } from "../../../api/sidebar";
+import bus from '@/utils/bus'
 
 export default {
   // components: {
@@ -67,10 +68,15 @@ export default {
     return {
       sidebarData: [],
       activeMenu: "",
+      collapse: false,
     };
   },
   created() {
     this.init();
+    bus.$on('collapse',(msg) => {
+      this.collapse = msg;
+      bus.$emit("collapse-content", msg);
+    })
   },
   methods: {
     async init() {
@@ -105,7 +111,7 @@ export default {
 <style rel="stylesheet/scss" lang="scss" scoped>
 .nest-menu .el-submenu > .el-submenu__title,
 .el-submenu .el-menu-item {
-  min-width: 179px !important;
+  min-width:180px !important;
 }
 .el-menu--collapse .el-menu .el-submenu {
   min-width: 180px !important;
