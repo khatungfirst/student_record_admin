@@ -15,13 +15,6 @@ export const menuOther = [
         }
     },
     {
-        path: 'teacherManagement',
-        component: () => import('../views/teacherManage/index.vue'),
-        meta:{
-            title:'老师管理'
-        }
-    },
-    {
         path: 'menu',
         component: () => import('../views/menuManage/index.vue'),
         meta:{
@@ -40,13 +33,6 @@ export const menuOther = [
         component: () => import('../views/articlemanagement/index.vue'),
         meta:{
             title:'帖子管理'
-        }
-    },
-    {
-        path: 'rolemanagement',
-        component: () => import('../views/rolemanagement/index.vue'),
-        meta:{
-            title:'角色管理'
         }
     },
     {

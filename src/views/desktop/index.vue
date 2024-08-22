@@ -221,7 +221,6 @@ export default {
     },
     //初始化和渲染图表
     renderChart() {
-      console.log(this.chartOption, "lllllog");
       // 使用ref获取DOM元素
       // let chartDom = this.$refs.chartContainer;
       // 初始化ECharts实例

@@ -8,10 +8,10 @@ Vue.use(Router)
 export const baseRoutes = [
   {
     path: '/layout',
-    // redirect:'/desktop',
+    redirect:'/layout/desktop',
     component: ()=>import('../views/layout/index.vue'),
     meta: {
-      title: '',
+      title: '首页',
       isLogin: true    //是否需要登录      
     },
     children: [
@@ -37,7 +37,7 @@ export const baseRoutes = [
 
 export const routes = [
   {
-    path: '/login',
+    path: '/',   
     name: 'login',
     component: ()=>import('../views/login/index.vue')
   },
