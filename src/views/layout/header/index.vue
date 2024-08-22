@@ -36,12 +36,13 @@ export default {
   },
   methods: {
     logout() {
-      // this.$store.dispatch("user/LogOut")
+      this.$store.dispatch("user/LogOut")
       this.$router.push('/login')
     },
     async init(){
       const data = await getDetailInfo()
       this.avatar = data.data.avatar
+      this.$store.dispatch('user/permissionInto',data.data.perms)
     }
   },
 };

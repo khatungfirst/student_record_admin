@@ -6,7 +6,8 @@ const user = {
   state: {
     token: getToken(),
     name: '',
-    userInfo: {}
+    userInfo: {},
+    permission:[]
   },
 
   mutations: {
@@ -22,6 +23,11 @@ const user = {
     },
     SET_USERINFO: (state, userinfo) => {
       state.userInfo = userinfo
+    },
+    SET_PERMISSION:(state,perm) => { 
+      state.permission = perm
+      console.log(perm,'permmmmm');
+      
     }
   },
 
@@ -38,6 +44,13 @@ const user = {
       localStorage.setItem('userInfo', JSON.stringify(context));//将用户信息存到本地
       console.log(JSON.parse(localStorage.getItem('userInfo')),'777');
       store.commit('SET_USERINFO',JSON.parse(localStorage.getItem('userInfo')))
+    },
+
+
+    //将用户的权限存入
+    permissionInto(store,context){
+      localStorage.setItem('perm', JSON.stringify(context));
+      store.commit('SET_PERMISSION',JSON.parse(localStorage.getItem('perm')))
     },
 
     // 登出

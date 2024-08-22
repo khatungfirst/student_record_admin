@@ -7,15 +7,11 @@ Vue.use(Router)
 // import NotFound from '@/views/404'
 export const baseRoutes = [
   {
-    path: '/',
-    name: 'login',
-    component: ()=>import('../views/login/index.vue')
-  },
-  {
     path: '/layout',
+    redirect:'/layout/desktop',
     component: ()=>import('../views/layout/index.vue'),
     meta: {
-      title: '',
+      title: '首页',
       isLogin: true    //是否需要登录      
     },
     children: [
@@ -39,11 +35,19 @@ export const baseRoutes = [
 
 ]
 
+export const routes = [
+  {
+    path: '/',   
+    name: 'login',
+    component: ()=>import('../views/login/index.vue')
+  },
+]
+
 
 const router = new Router({
   mode:'history',
   base: process.env.BASE_URL,
-  baseRoutes
+  routes
 })
 
 
@@ -106,4 +110,3 @@ export default router
 // export const asyncRouterMap = [
 //   { path: '*', redirect: '/404', hidden: true }
 // ]
-

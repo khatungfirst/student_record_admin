@@ -8,6 +8,6 @@ export const getDesktopInfo = (role) => {
 
 //2、选择日期后柱状图的数据变化
 export const updateHistogramInfo = (date) => {
-    date = JSON.stringify(date)
-    return request.get(`/user/fpage/pillar?${date}`)
+    // date = JSON.stringify(date)
+    return request.get(`/user/fpage/pillar?date=${date}`)
 }

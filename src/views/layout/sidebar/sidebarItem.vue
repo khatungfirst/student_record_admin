@@ -2,6 +2,8 @@
   <el-menu
     :default-active="activeMenu"
     :unique-opened="true"
+    @open="handleOpen"
+    @close="handleClose"
   >
     <!-- 对items进行遍历 -->
     <template v-for="item in menuList">
@@ -18,7 +20,6 @@
             <!-- 判定是否具有第三级菜单 -->
             <el-submenu
               v-if="subItem.children && subItem.children.length > 0"
-              :index="subItem.path"
               :key="subItem.id"
             >
               <i :class="subItem.meta.icon"></i>
@@ -28,13 +29,17 @@
               <el-menu-item
                 v-for="(threeItem, i) in subItem.children"
                 :key="i"
-               @click="handleMenuSelect(threeItem.component)"
+                @click="handleMenuSelect(threeItem.component)"
                 >{{ threeItem.meta.title }}</el-menu-item
               >
             </el-submenu>
 
             <!-- 如果不存在第三级菜单，渲染第二级菜单标题 -->
-            <el-menu-item :key="subItem.id" @click="handleMenuSelect(subItem.component)"  v-else>
+            <el-menu-item
+              :key="subItem.id"
+              @click="handleMenuSelect(subItem.component)"
+              v-else
+            >
               <i :class="subItem.meta.icon"></i
               >{{ subItem.meta.title }}</el-menu-item
             >
@@ -64,22 +69,31 @@ export default {
   },
   data() {
     return {
-      activeMenu: "",
+      activeMenu: "desktop",
     };
   },
+  mounted() {
+    console.log(this.menuList, "mulll");
+    
+  },
   computed: {
-    onRoutes() {
-      // console.log(this.$route.path,'path');
-      //返回当前的路由
-      return this.$route.path.replace("/", "");
+    currentSelect(val) {
+      console.log(val, "valll");
+      this.activeMenu = val;
     },
   },
   methods: {
     handleMenuSelect(val) {
-      this.activeMenu = val;
+      debugger;
       this.$router.push(`/layout/${val}`);
-      console.log(this.activeMenu, "val");
-      // this.push
+      console.log(val, "val");
+      this.activeMenu = val;
+    },
+    handleOpen(key, keyPath) {
+      console.log(key, keyPath);
+    },
+    handleClose(key, keyPath) {
+      console.log(key, keyPath);
     },
   },
 };

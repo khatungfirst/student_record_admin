@@ -5,7 +5,7 @@
     <div class="top">
       <el-input placeholder="请搜索要推选的人的姓名" v-model="search">
       </el-input>
-      <el-button type="primary" icon="el-icon-search" @click="initStar"
+      <el-button type="primary" icon="el-icon-search" @click="initStar" v-permission="'star:user:query'"
         >搜索</el-button
       >
     </div>
@@ -97,9 +97,10 @@
             type="primary"
             @click="electUsers"
             :disabled="buttonDisabled"
+            v-permission="'star:user:select'"
             >推选<i class="el-icon-s-promotion"></i
           ></el-button>
-          <el-button type="primary" @click="publicStar">发布</el-button>
+          <el-button type="primary" @click="publicStar" v-permission="'star:user:public'">发布</el-button>
         </div>
       </div>
     </div>
@@ -112,6 +113,7 @@
           placeholder="请用阿拉伯数字"
           v-model="term"
           @change="searchTerm"
+          v-permission="'star:term:query'"
         >
           <template slot="prepend">查找第</template>
           <template slot="append">届成长之星名单</template>
