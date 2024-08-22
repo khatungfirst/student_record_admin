@@ -94,7 +94,7 @@
             style="width: 65%"
           >
           </el-input>
-          <el-button type="primary" id="select" @click="init">搜索</el-button>
+          <el-button type="primary" id="select" @click="init" v-permission="'user:student:query'">搜索</el-button>
           <el-button type="success" plain id="add" @click="reloadStudents"
             >重置</el-button
           >
@@ -142,6 +142,7 @@
                 style="padding: 3px 0"
                 type="text"
                 @click="addSignalStudent"
+                 v-permission="'user:student:addSingleStudent'"
                 >单个添加</el-button
               >
             </div>
@@ -155,6 +156,7 @@
               action="/api/stuManage/addMultipleStudent"
               multiple
               :on-success="uploadSuccess"
+              v-permission="'user:student:addMultipleStudent'"
             >
               <i class="el-icon-upload"></i>
               <div class="el-upload__text">
@@ -206,7 +208,7 @@
         <p>学员列表</p>
         <div class="top-right">
           <!-- 设为管理员按钮 -->
-          <span class="el-dropdown-link" @click="deleteStudent">
+          <span class="el-dropdown-link" @click="deleteStudent" v-permission="'user:student:delete'">
             批量删除
           </span>
 
@@ -303,6 +305,7 @@
               active-color="#13ce66"
               inactive-color="#ff4949"
               @change="disableButton(scope.row)"
+              v-permission="'user:student:ban'"
             >
             </el-switch>
           </template>
@@ -318,6 +321,7 @@
             <a
               style="margin-right: 20px; color: #75d6a9"
               @click="editFun(scope.row)"
+              v-permission="'user:student:edit'"
               >编辑信息</a
             >
             <!-- <a
@@ -329,6 +333,7 @@
               trigger="click"
               placement="top-start"
               @command="setAdmin($event,scope.row)"
+              v-permission="'user:student:setManager'"
             >
               <span class="el-dropdown-link" style="cursor: pointer;"> 设为管理员 </span>
               <el-dropdown-menu slot="dropdown">
@@ -343,7 +348,7 @@
 
       <!-- 分页 -->
       <div class="paginatio">
-        <span @click="exportInfo">批量导出</span>
+        <span @click="exportInfo" v-permission="'user:student:edit'">批量导出</span>
         <el-pagination
           @current-change="handleCurrentChange"
           :current-page.sync="initInfo.page"

@@ -20,11 +20,24 @@ Vue.use(ElementUI, {
 Vue.config.productionTip = false
 
 //注册自定义指令 控制功能权限
-Vue.directive('permission',{
+Vue.directive('permission', {
   //会在指令作用的元素插入dom之后执行
-  inserted(el,binding){
-    console.log(el,'el');
-    console.log(binding,'binding');
+  inserted(el, binding) {
+    //el是当前指令作用的dom元素的对象
+    //binding是v-permission=“表达式” 表达式的信息
+    const points = JSON.parse(localStorage.getItem('perm')) || []
+    // console.log(JSON.parse(localStorage.getItem('perm')),'points');
+    // console.log(binding.value,'binding');
+
+    //判断points中是否包含v-permission=“表达式” 表达式的值
+    if (!points.includes(binding.value)) {
+      //禁用或者删除
+      if (binding.value === 'topic:day:query' || binding.value === 'user:student:query' || binding.value === 'user:student:ban' || binding.value === 'user:teacher:query' || binding.value === 'user:teacher:ban' || binding.value === 'right:menu:query' || binding.value === 'article:query' || binding.value === 'star:user:query') {
+        el.disabled = true
+      } else {
+        el.remove()
+      }
+    }
   }
 })
 

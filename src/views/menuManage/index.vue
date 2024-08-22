@@ -9,13 +9,13 @@
         class="selectInput"
       >
       </el-input>
-      <el-button icon="el-icon-search" circle @click="select"></el-button>
+      <el-button icon="el-icon-search" circle @click="select" v-permission="'right:menu:query'"></el-button>
       <el-button @click="reset"><i class="el-icon-refresh"></i>重置</el-button>
       <el-button
         style="background-color: #fc5430; color: aliceblue"
         @click="addMenu"
         type="primary"
-        v-permission
+        v-permission="'right:menu:build'"
         ><i class="el-icon-plus"></i>新建菜单</el-button
       >
       <el-drawer
@@ -227,10 +227,10 @@
           align="center"
         >
           <template slot-scope="scope">
-            <el-button @click="handleClick(scope.row)" type="text" size="small"
+            <el-button @click="handleClick(scope.row)" type="text" size="small" v-permission="'right:menu:delete'"
               >删除</el-button
             >
-            <el-button type="text" size="small" @click="edit(scope.row)"
+            <el-button type="text" size="small" @click="edit(scope.row)" v-permission="'right:menu:edit'"
               >编辑</el-button
             >
           </template>

@@ -92,6 +92,7 @@
             :editable="false"
             @change="dateCheck"
             value-format="yyyy-MM-dd"
+            v-permission="'topic:day:query'"
           >
             <!-- :picker-options="pickerOptions" -->
           </el-date-picker>

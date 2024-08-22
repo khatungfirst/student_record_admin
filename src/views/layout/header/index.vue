@@ -42,6 +42,7 @@ export default {
     async init(){
       const data = await getDetailInfo()
       this.avatar = data.data.avatar
+      this.$store.dispatch('user/permissionInto',data.data.perms)
     }
   },
 };
