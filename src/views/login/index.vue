@@ -37,7 +37,6 @@
         <img src="" alt="" @click="getPicCodeFun" />
         <input
           id="verifyInput"
-          type="password"
           required
           v-model="loginForm.verify"
         />
