@@ -45,7 +45,7 @@
             style="background-color: rgb(254, 164, 90)"
           >
             <template #icon>
-              <i class="iconfont">&#xe620;</i>
+              <i class="iconfont">&#xe70d;</i>
             </template>
             <template #text1>
               <p>今日访客数</p>
@@ -66,7 +66,7 @@
             style="background-color: rgb(254, 115, 100)"
           >
             <template #icon>
-              <i class="iconfont">&#xe70d;</i>
+              <i class="iconfont">&#xe620;</i>
             </template>
             <template #text1>
               <p>人员总数</p>

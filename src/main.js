@@ -41,13 +41,6 @@ Vue.directive('permission', {
     }
   }
 })
-// 获取input焦点
-Vue.directive('focus', {
-  inserted: function (el) {
-    el.focus()
-  }
-})
-
 new Vue({
   el: '#app',
   router,
