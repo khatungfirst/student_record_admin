@@ -138,8 +138,8 @@
               <i class="el-icon-s-order"></i>
             </div>
             <div class="text">
-              <p>总贴数</p>
-              <p>{{ articleReadTotal }}</p>
+              <p>总赞数</p>
+              <p>{{ likeTotal }}</p>
             </div>
           </el-col>
           <el-col :span="12">
@@ -148,7 +148,7 @@
             </div>
             <div class="text">
               <p>总阅读数</p>
-              <p>{{ likeTotal }}</p>
+              <p>{{ articleReadTotal }}</p>
             </div>
           </el-col>
         </el-row>
@@ -186,9 +186,6 @@ export default {
       //柱形图中的数据
       chartOption: {},
     };
-  },
-  computed: {
-    // ...mapGetters({role:'user/roles'}),
   },
   created() {
     // this.handleListener();
@@ -253,13 +250,16 @@ export default {
       this.articleReadTotal = data.article_read_total;
       this.likeTotal = data.upvote_amount;
       this.chartOption = data.chartOption;
-      console.log(this.chartOption,'--------------');
-      
+      console.log(this.chartOption, "--------------");
+
       this.renderChart();
     },
 
     //根据日期查询对应的柱状图数据
     async dateCheck() {
+      if (this.date === null) {
+        this.date = "";
+      }
       const chartOption = await updateHistogramInfo(this.date);
       this.chartOption = chartOption.data.chartOption;
       console.log(this.chartOption, "chart");
@@ -268,7 +268,6 @@ export default {
         this.myChart.dispose();
         this.renderChart();
       }
-
     },
   },
   beforeDestroy() {
