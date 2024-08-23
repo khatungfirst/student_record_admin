@@ -148,7 +148,7 @@
                 style="padding: 3px 0"
                 type="text"
                 @click="addSignalStudent"
-                v-permission="'user:student:addSinglestudent'"
+                v-permission="'user:student:addsinglestudent'"
                 >单个添加</el-button
               >
             </div>
@@ -224,7 +224,7 @@
           <el-form-item label="班级">
             <el-input v-model="editInfo.class"></el-input>
           </el-form-item>
-          <el-form-item label="电话号">
+          <el-form-item label="手机号">
             <el-input v-model="editInfo.telephone"></el-input>
           </el-form-item>
           <el-form-item label="密码">

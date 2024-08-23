@@ -17,7 +17,7 @@
           type="username"
           required
           v-model="loginForm.username"
-         
+          v-focus
         />
         <!-- <input id="usernameInput"type="username" required /> -->
         <label ref="usernameLabel" :class="{ labels: label }">账号</label>
@@ -29,17 +29,12 @@
           type="password"
           required
           v-model="loginForm.password"
-         
         />
         <label ref="passwordLabel">密码</label>
       </div>
       <div class="input-box">
         <img src="" alt="" @click="getPicCodeFun" />
-        <input
-          id="verifyInput"
-          required
-          v-model="loginForm.verify"
-        />
+        <input id="verifyInput" required v-model="loginForm.verify" />
         <label>验证码</label>
       </div>
 
