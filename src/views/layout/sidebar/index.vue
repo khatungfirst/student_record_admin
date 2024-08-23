@@ -1,5 +1,5 @@
 <template>
-  <el-menu :default-active="activeMenu" :unique-opened="true" :collapse="collapse">
+    <el-menu :default-active="activeMenu" :unique-opened="true" :collapse="collapse">
     <!-- 对items进行遍历 -->
     <template v-for="item in sidebarData">
       <!-- 使用v-if判定是否具有第二级菜单 -->
@@ -115,5 +115,9 @@ export default {
 }
 .el-menu--collapse .el-menu .el-submenu {
   min-width: 180px !important;
+}
+
+.el-menu-item::-webkit-scrollbar {
+  width: 0;
 }
 </style>

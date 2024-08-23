@@ -3,7 +3,6 @@
 //dyMenu后端动态路由文件
 import { cloneDeep } from "lodash";
 export function ruleMenu(menu,dyMenu){
-    console.log(dyMenu,'dyyyyyyyy');
        
     let menuArr=[];
     let arr = cloneDeep(menu)

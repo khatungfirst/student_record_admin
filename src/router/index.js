@@ -11,7 +11,7 @@ export const baseRoutes = [
     redirect:'/layout/desktop',
     component: ()=>import('../views/layout/index.vue'),
     meta: {
-      title: '首页',
+      title: '后台',
       isLogin: true    //是否需要登录      
     },
     children: [

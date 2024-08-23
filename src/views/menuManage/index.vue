@@ -417,6 +417,7 @@ export default {
       for (let prop in this.ruleForm) {
         this.ruleForm[prop] = null;
       }
+      this.ruleForm.type = newValue
     },
   },
 };

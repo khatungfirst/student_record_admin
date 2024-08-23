@@ -17,7 +17,6 @@ router.beforeEach((to, from, next) => {
       NProgress.done() // 结束Progress
   }else {
       // debugger
-      console.log(to,'0000');
 
       if (to.name === 'login') {
           next(); // 已在登录页，允许导航
