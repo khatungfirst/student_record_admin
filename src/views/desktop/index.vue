@@ -135,7 +135,7 @@
         <el-row>
           <el-col :span="12">
             <div class="img" style="background-color: #f3d026">
-              <i class="el-icon-s-order"></i>
+              <i class="el-icon-thumb"></i>
             </div>
             <div class="text">
               <p>总赞数</p>
@@ -144,7 +144,7 @@
           </el-col>
           <el-col :span="12">
             <div class="img" style="background-color: #03b4fd">
-              <i class="el-icon-s-management"></i>
+              <i class="el-icon-view"></i>
             </div>
             <div class="text">
               <p>总阅读数</p>
