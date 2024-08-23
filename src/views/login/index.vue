@@ -1,5 +1,5 @@
 <template>
-  <div class="login-container">
+  <div class="wrapper">
     <el-form
       autoComplete="on"
       :model="loginForm"
@@ -9,79 +9,53 @@
       label-width="0px"
       class="card-box login-form"
     >
-      <div class="left">
-        <p style="padding-left: 20px">
-          <i class="iconfont">&#xe603;</i>
-          <span style="font-weight: 800; font-family: '楷体'; font-size: 20px"
-            >成长档案</span
-          >
-        </p>
-        <div>
-          <p class="text1">欢迎回来</p>
-          <p class="text2">这里是一款管理大学学习生活记录的平台</p>
-          <p class="text2">管理 从这里开始！</p>
-        </div>
+      <h1>Login</h1>
+      <div class="input-box">
+        <i class="el-icon-message"></i>
+        <input
+          id="usernameInput"
+          type="username"
+          required
+          v-model="loginForm.username"
+         
+        />
+        <!-- <input id="usernameInput"type="username" required /> -->
+        <label ref="usernameLabel" :class="{ labels: label }">账号</label>
       </div>
-      <div class="right">
-        <h3 class="title">后台登录</h3>
-        <el-form-item prop="username">
-          <!-- autoComplete="on"告诉浏览器尝试根据用户之前输入的值自动填充该字段 -->
-          <el-input
-            name="username"
-            type="text"
-            v-model="loginForm.username"
-            autoComplete="on"
-            placeholder="username"
-          >
-            <template slot="prepend"
-              ><i class="el-icon-user" style="font-size: 16px"></i
-            ></template>
-          </el-input>
-        </el-form-item>
-        <el-form-item prop="password">
-          <el-input
-            name="password"
-            type="password"
-            @keyup.enter.native="handleLogin"
-            v-model="loginForm.password"
-            autoComplete="on"
-            placeholder="password"
-          >
-            <template slot="prepend"
-              ><i class="el-icon-lock" style="font-size: 16px"></i
-            ></template>
-          </el-input>
-        </el-form-item>
-        <div class="verificationContainer">
-          <div class="verificationLeft">
-            <el-input
-              name="Verification"
-              type="text"
-              v-model="loginForm.verify"
-              autoComplete="on"
-              placeholder="请输入验证码"
-              id="verification"
-            >
-              <template slot="prepend"
-                ><i class="iconfont">&#xe609;</i></template
-              >
-            </el-input>
-          </div>
-          <div class="verificationRight">
-            <img src="" alt="" @click="getPicCodeFun"/>
-          </div>
-        </div>
-        <el-form-item>
-          <el-button
-            type="primary"
-            size="medium"
-            :loading="loading"
-            @click="handleLogin"
-          >
-            登录
-          </el-button>
-        </el-form-item>
+      <div class="input-box">
+        <i class="el-icon-lock"></i>
+        <input
+          id="passwordInput"
+          type="password"
+          required
+          v-model="loginForm.password"
+         
+        />
+        <label ref="passwordLabel">密码</label>
       </div>
+      <div class="input-box">
+        <img src="" alt="" @click="getPicCodeFun" />
+        <input
+          id="verifyInput"
+          type="password"
+          required
+          v-model="loginForm.verify"
+        />
+        <label>验证码</label>
+      </div>
+
+      <el-form-item>
+        <el-button
+          type="primary"
+          size="medium"
+          :loading="loading"
+          @click="handleLogin"
+          class="btn"
+        >
+          Login
+        </el-button>
+      </el-form-item>
+      <!-- <button  onclick="handleLogin()" class="btn">Login</button> -->
     </el-form>
   </div>
 </template>
@@ -91,7 +65,7 @@
 import { getPicCode } from "../../api/login";
 import { login } from "../../api/login";
 import { Message } from "element-ui";
-import {EventBus } from '../../main'
+import { EventBus } from "../../main";
 export default {
   name: "login",
   data() {
@@ -106,13 +80,39 @@ export default {
       },
       loginRules: {
         username: [
-          { required: true, trigger: "blur",min:11,max:11 ,message:'账号（学号或者手机号）必须是11位'}, //填写规则，必填+失去焦点时提交
+          {
+            required: true,
+            trigger: "blur",
+            min: 11,
+            max: 11,
+            message: "账号（学号或者手机号）必须是11位",
+          }, //填写规则，必填+失去焦点时提交
         ],
-        password: [{ required: true, trigger: "blur",min:5,message:'密码必须在5位以上' }],
+        password: [
+          {
+            required: true,
+            trigger: "blur",
+            min: 5,
+            message: "密码必须在5位以上",
+          },
+        ],
       },
       loading: false,
+      //控制字体是否向上移动
+      label: false,
     };
   },
+  // mounted() {
+  //   console.log('--------');
+
+  //   console.log(this.loginForm.username,'username');
+
+  //   if(this.loginForm.username === ''){
+  //     console.log('-------------');
+
+  //     this.label = true
+  //   }
+  // },
   methods: {
     //登录
     async handleLogin() {
@@ -122,21 +122,18 @@ export default {
       // console.log(this.loginForm.right_verify, "???");
       //判断验证码是否正确
       if (this.loginForm.verify === this.loginForm.right_verify) {
-        console.log(this.loginForm.verify,'111111');
+        console.log(this.loginForm.verify, "111111");
         const data = await login(
           this.loginForm.username,
           this.loginForm.password,
           this.loginForm.verify,
           this.loginForm.verify_id
         );
-        console.log(data,'22222');
         const code = data.code;
-        console.log(data.code,'code');
         if (code === 200) {
-          console.log('000000');
           this.$store.dispatch("user/userInfo", data.data);
           this.$store.dispatch("user/tokenIn", data.data.token); //把token存到vuex中
-          this.$router.push('/layout')  
+          this.$router.push("/layout");
         }
       } else {
         Message("验证码输入错误，请重新输入！");
@@ -146,8 +143,6 @@ export default {
     async getPicCodeFun() {
       try {
         const codeData = await getPicCode();
-        console.log(codeData, "data"); // 检查后端响应
-
         if (codeData.code === 200) {
           this.loginForm.base_code = codeData.data.B64; // 获取 base64 编码
           this.loginForm.verify_id = codeData.data.Id; // 获取验证码的 ID
@@ -156,7 +151,7 @@ export default {
 
           // 处理 Data URI
           const base64String = this.loginForm.base_code.split(",")[1];
-          console.log(this.loginForm.base_code,'111');
+          console.log(this.loginForm.base_code, "111");
           if (!base64String) {
             throw new Error("Invalid base64 string in Data URI");
           }
@@ -201,138 +196,173 @@ export default {
 
 <style rel="stylesheet/scss" lang="scss">
 * {
+  font-family: "Poppins", sans-serif;
   box-sizing: border-box;
 }
-.login-container {
-  position: fixed;
-  height: 100%;
+body {
+  min-height: 100vh;
+  background: url(../../../static/img/bgc.jpg);
+  background-size: cover;
+  background-position: center;
+}
+
+.labels {
+  position: absolute;
+  top: -5px;
+}
+
+.wrapper {
+  position: relative;
+  width: 400px;
+  height: 450px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(15px);
+  margin: auto;
+}
+
+.wrapper:hover {
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.5);
+  // background: #46474e;
+}
+
+.wrapper h1 {
+  font-size: 2em;
+  color: #fff;
+  text-align: center;
+}
+
+.wrapper .input-box {
+  position: relative;
+  width: 310px;
+  margin: 30px 0;
+  border-bottom: 2px solid #fff;
+}
+
+.wrapper .input-box input {
   width: 100%;
-
-  .el-form {
-    display: flex;
-
+  height: 50px;
+  background: transparent;
+  outline: none;
+  border: none;
+  font-size: 1em;
+  color: #fff;
+  padding: 0 40px 0 5px;
+  //去除自动填充的白色背景
+  &:-webkit-autofill,
+  textarea:-webkit-autofill,
+  select:-webkit-autofill {
+    -webkit-text-fill-color: #fff !important;
+    -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+    background-color: transparent;
+    background-image: none;
+    transition: background-color 50000s ease-in-out 0s; //背景色透明  生效时长  过渡效果  启用时延迟的时间
   }
-  .left {
-    width: 37%;
-    background-color: #b2c3b3; //#657459
-    float: left;
-    // border-radius: 20px;
-    .text1 {
-      text-align: center;
-      margin-top: 80px;
-      font-family: "楷体";
-      font-size: 22px;
-    }
-    .text2 {
-      text-align: center;
-      font-size: 16px;
-      padding: 0 40px;
-      color: #fff;
-      font-family: "楷体";
-    }
-    .text1 {
-      text-align: center;
-      margin-top: 80px;
-      font-family: "楷体";
-      font-size: 22px;
-    }
-    .text2 {
-      text-align: center;
-      font-size: 16px;
-      padding: 0 40px;
-      color: #fff;
-      font-family: "楷体";
-    }
+}
+
+.wrapper .input-box label {
+  position: absolute;
+  top: 50%;
+  left: 5px;
+  transform: translateY(-50%);
+  font-size: 1em;
+  color: #fff;
+  pointer-events: none;
+  transition: 0.5s;
+}
+
+.wrapper .input-box input:focus ~ label,
+.wrapper .input-box input:valid ~ label {
+  top: -5px;
+}
+
+.wrapper .input-box i {
+  position: absolute;
+  right: 8px;
+  color: #fff;
+  font-size: 1.2em;
+  line-height: 57px;
+}
+.wrapper .input-box img {
+  position: absolute;
+  right: 8px;
+}
+
+.wrapper .row {
+  margin: -15px 0 15px;
+  font-size: 0.9em;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+}
+
+.wrapper .row label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.wrapper .row a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.wrapper .options a:hover {
+  text-decoration: underline;
+}
+
+.wrapper .btn {
+  width: 100%;
+  height: 40px;
+  background: #fff;
+  outline: none;
+  border: none;
+  border-radius: 40px;
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: 500;
+  color: #000;
+  margin-top: 10px;
+}
+
+.btn:hover {
+  background: #ffffea;
+}
+
+.wrapper .signup-link {
+  font-size: 0.9em;
+  color: #fff;
+  text-align: center;
+  margin: 25px 0 10px;
+}
+
+.wrapper .signup-link a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.wrapper .signup-link a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 360px) {
+  .wrapper {
+    width: 100%;
+    height: 100vh;
+    border: none;
+    border-radius: 0px;
   }
 
-  .svg-container {
-    padding: 6px 5px 6px 15px;
-    color: #889aa4;
-    vertical-align: middle;
-    width: 30px;
-    display: inline-block;
-
-    .svg-icon {
-      width: 1em;
-      height: 1em;
-      vertical-align: -0.15em;
-      fill: currentColor;
-      overflow: hidden;
-    }
+  .wrapper .input-box {
+    width: 290px;
   }
-  .right {
-    padding: 40px 45px 30px 45px;
-    margin: 0 auto;
-    text-align: center;
-
-    img {
-      width: 93%;
-      height: 32px;
-      background-color: #889aa4;
-    }
-    .title {
-      font-size: 26px;
-      font-weight: 400;
-      color: #b2c3b3;
-      margin: 0px auto 40px auto;
-      text-align: center;
-      font-weight: bold;
-    }
-    #ver {
-      height: 32px;
-    }
-
-    .verificationContainer {
-      display: flex;
-      align-items: center;
-      margin-bottom: 20px;
-      // height: 100%;
-    }
-
-    .verificationLeft {
-      flex: 5;
-    }
-
-    .verificationRight {
-      flex: 2;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-    }
-
-    .el-form-item {
-      border-radius: 5px;
-      color: #454545;
-      margin: 30px 0px;
-    }
-
-    .el-form-item::before,
-    .el-form-item::after {
-      content: none;
-    }
-    .el-radio {
-      margin-bottom: 15px;
-    }
-    .el-button {
-      width: 100px;
-      border-radius: 20px;
-      background-color: #b2c3b3;
-      border: none;
-    }
-  }
-  .login-form {
-    position: absolute;
-    left: 0;
-    right: 0;
-    width: 40%;
-    margin:auto;
-    top: 50%;
-    // transform: translateX(-50%);
-    transform: translateY(-50%); 
-    background-color: #fff;
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-    border-radius: 20px;
+  #img {
+    z-index: -90;
   }
 }
 </style>
