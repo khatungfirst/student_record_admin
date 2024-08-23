@@ -1,5 +1,5 @@
 <template>
-    <el-menu :default-active="activeMenu" :unique-opened="true" :collapse="collapse">
+    <el-menu :default-active="activeMenu" :unique-opened="true" :collapse="collapse" style="position: absolute;">
     <!-- 对items进行遍历 -->
     <template v-for="item in sidebarData">
       <!-- 使用v-if判定是否具有第二级菜单 -->
@@ -109,9 +109,6 @@ export default {
 };
 </script>
 <style rel="stylesheet/scss" lang="scss" scoped>
-.el-menu {
-  position: none;
-}
 .nest-menu .el-submenu > .el-submenu__title,
 .el-submenu .el-menu-item {
   min-width:180px !important;
