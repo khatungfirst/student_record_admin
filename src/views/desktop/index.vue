@@ -358,8 +358,8 @@ export default {
       display: flex;
       justify-content: space-around;
       margin-bottom: 2vh;
-      padding: 2vh;
-      flex: 1 0 200px; /* flex-grow、flex-shrink 和 flex-basis */
+      padding: 10px;
+      flex: 1 0 280px; /* flex-grow、flex-shrink 和 flex-basis */
       transition: 0.6s ease;
 
       i {

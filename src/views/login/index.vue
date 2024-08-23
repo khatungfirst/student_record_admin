@@ -106,9 +106,9 @@ export default {
       },
       loginRules: {
         username: [
-          { required: true, trigger: "blur" }, //填写规则，必填+失去焦点时提交
+          { required: true, trigger: "blur",min:11,max:11 ,message:'账号（学号或者手机号）必须是11位'}, //填写规则，必填+失去焦点时提交
         ],
-        password: [{ required: true, trigger: "blur" }],
+        password: [{ required: true, trigger: "blur",min:5,message:'密码必须在5位以上' }],
       },
       loading: false,
     };
@@ -210,11 +210,13 @@ export default {
 
   .el-form {
     display: flex;
+
   }
   .left {
     width: 37%;
     background-color: #b2c3b3; //#657459
     float: left;
+    // border-radius: 20px;
     .text1 {
       text-align: center;
       margin-top: 80px;
@@ -271,7 +273,7 @@ export default {
     .title {
       font-size: 26px;
       font-weight: 400;
-      color: #333;
+      color: #b2c3b3;
       margin: 0px auto 40px auto;
       text-align: center;
       font-weight: bold;
@@ -324,9 +326,13 @@ export default {
     left: 0;
     right: 0;
     width: 40%;
-    margin: 120px auto;
+    margin:auto;
+    top: 50%;
+    // transform: translateX(-50%);
+    transform: translateY(-50%); 
     background-color: #fff;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
   }
 }
 </style>

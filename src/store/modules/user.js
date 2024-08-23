@@ -60,6 +60,8 @@ const user = {
       store.commit('SET_USERINFO', {})
       removeToken()
       localStorage.removeItem('token')
+      localStorage.removeItem('userInfo')
+      localStorage.removeItem('perm')
     },
 
      // 前端 登出
