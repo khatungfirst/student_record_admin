@@ -17,20 +17,21 @@
           type="username"
           required
           v-model="loginForm.username"
-          v-focus
         />
         <!-- <input id="usernameInput"type="username" required /> -->
-        <label ref="usernameLabel" :class="{ labels: label }">账号</label>
+        <label ref="usernameLabel">账号</label>
       </div>
       <div class="input-box">
-        <i class="el-icon-lock"></i>
+        <!-- <i class="el-icon-lock"></i> -->
         <input
           id="passwordInput"
-          type="password"
+          :type="inputType" 
           required
           v-model="loginForm.password"
         />
         <label ref="passwordLabel">密码</label>
+          <i class="el-icon-view" @click="togglePassword"></i>
+          <!-- 注意：your-custom-eye-slash-icon-class 需要你自定义或替换为 Element UI 中的其他合适图标类名 -->
       </div>
       <div class="input-box">
         <img src="" alt="" @click="getPicCodeFun" />
@@ -94,43 +95,51 @@ export default {
       loading: false,
       //控制字体是否向上移动
       label: false,
+      //控制密码是否可显示
+      showPassword: false,
+      inputType: 'password', 
     };
   },
-  // mounted() {
-  //   console.log('--------');
-
-  //   console.log(this.loginForm.username,'username');
-
-  //   if(this.loginForm.username === ''){
-  //     console.log('-------------');
-
-  //     this.label = true
-  //   }
-  // },
+  computed: {
+    passwordType() {
+      return this.showPassword ? "text" : "password";
+    },
+  },
   methods: {
     //登录
     async handleLogin() {
-      if (this.loginForm.verify === null) {
-        Message("验证码不能为空！");
-      }
-      // console.log(this.loginForm.right_verify, "???");
-      //判断验证码是否正确
-      if (this.loginForm.verify === this.loginForm.right_verify) {
-        console.log(this.loginForm.verify, "111111");
-        const data = await login(
-          this.loginForm.username,
-          this.loginForm.password,
-          this.loginForm.verify,
-          this.loginForm.verify_id
-        );
-        const code = data.code;
-        if (code === 200) {
-          this.$store.dispatch("user/userInfo", data.data);
-          this.$store.dispatch("user/tokenIn", data.data.token); //把token存到vuex中
-          this.$router.push("/layout");
-        }
+      if (
+        this.loginForm.username === "" ||
+        this.loginForm.username.length !== 11
+      ) {
+        Message("账号不能为空，并且长度必须是11位！");
       } else {
-        Message("验证码输入错误，请重新输入！");
+        if (this.loginForm.password === "") {
+          Message("密码不能为空！");
+        } else {
+          if (this.loginForm.verify === null) {
+            Message("验证码不能为空！");
+          }
+          // console.log(this.loginForm.right_verify, "???");
+          //判断验证码是否正确
+          if (this.loginForm.verify === this.loginForm.right_verify) {
+            console.log(this.loginForm.verify, "111111");
+            const data = await login(
+              this.loginForm.username,
+              this.loginForm.password,
+              this.loginForm.verify,
+              this.loginForm.verify_id
+            );
+            const code = data.code;
+            if (code === 200) {
+              this.$store.dispatch("user/userInfo", data.data);
+              this.$store.dispatch("user/tokenIn", data.data.token); //把token存到vuex中
+              this.$router.push("/layout/desktop");
+            }
+          } else {
+            Message("验证码输入错误，请重新输入！");
+          }
+        }
       }
     },
     //获取图形验证码
@@ -176,6 +185,12 @@ export default {
       }
       return new Blob([new Uint8Array(array)], { type: "image/jpeg" });
     },
+
+    //控制密码是否可显示
+    togglePassword() {
+      this.showPassword = !this.showPassword;
+      this.inputType = this.showPassword ? 'text' : 'password';  
+    },
   },
   async mounted() {
     try {
@@ -198,6 +213,18 @@ body {
   background: url(../../../static/img/bgc.jpg);
   background-size: cover;
   background-position: center;
+}
+
+.passwordChange {
+  display: inline-block;
+  width: 40px;
+  cursor: pointer;  
+
+  i {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+  }
 }
 
 .labels {

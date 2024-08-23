@@ -14,7 +14,7 @@
           管理员：<span></span> <i class="el-icon-caret-bottom"></i>
         </div>
         <el-dropdown-menu class="user-dropdown" slot="dropdown">
-          <router-link class="inlineBlock" to="/">
+          <router-link class="inlineBlock" to="/layout/desktop">
             <el-dropdown-item>返回首页</el-dropdown-item>
           </router-link>
         </el-dropdown-menu>
