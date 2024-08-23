@@ -60,7 +60,7 @@
 </template>
 
 <script>
-// import { isvalidUsername } from "@/utils/validate";
+// import { isvalidUsername } from "@/utils/validate";11
 import { getPicCode } from "../../api/login";
 import { login } from "../../api/login";
 import { Message } from "element-ui";
