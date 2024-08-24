@@ -339,10 +339,10 @@ export default {
 
     //公布成长之星名单
     async publicStar() {
-      this.initStar()
       this.buttonDisabled = false;
       const data = await publicStar();
       this.initPublic(data);
+      this.initStar()
     },
 
     //重新选择
