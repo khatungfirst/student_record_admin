@@ -23,8 +23,8 @@ service.interceptors.request.use(config => {
   // })
 
   
-  if (localStorage.getItem('token')) {
-    config.headers['token'] = getToken() || localStorage.getItem('token')
+  if (sessionStorage.getItem('token')) {
+    config.headers['token'] = getToken() || sessionStorage.getItem('token')
   }
   
   return config
