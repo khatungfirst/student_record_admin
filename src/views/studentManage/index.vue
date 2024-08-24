@@ -265,7 +265,7 @@
         tooltip-effect="dark"
         style="width: 100%"
         header-align="center"
-        @select="handleSelectionChange"
+        @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" align="center"> </el-table-column>
         <el-table-column prop="name" label="姓名" align="center">
@@ -526,20 +526,20 @@ export default {
     },
 
     //将这个选中的行数据数组赋值给 multipleSelection 变量
-    handleSelectionChange(selection, val) {
-      console.log(val, "val");
-      const existingItem = this.selectedArr.find(
-        (item) => item.username === val.username
-      );
-      if (!existingItem) {
-        this.multipleSelection = val;
-        this.selectedArr.push(this.multipleSelection); //返回的是数组长度！！影响原数组
-      } else {
-        console.log("去掉");
-        this.selectedArr = this.selectedArr.filter(
-          (item) => item.username !== val.username
-        ); //不会改变原数组！！
-      }
+    handleSelectionChange(val) {
+      this.selectedArr = val
+      // const existingItem = this.selectedArr.find(
+      //   (item) => item.username === val[val.length-1].username
+      // );
+      // if (!existingItem) {
+      //   this.multipleSelection = val[val.length-1];
+      //   this.selectedArr.push(this.multipleSelection); //返回的是数组长度！！影响原数组
+      // } else {
+      //   console.log("去掉");
+      //   this.selectedArr = this.selectedArr.filter(
+      //     (item) => item.username !== val[val.length-1].username
+      //   ); //不会改变原数组！！
+      // }
       console.log(this.selectedArr, "arr");
     },
 

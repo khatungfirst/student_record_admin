@@ -219,9 +219,9 @@ export default {
     //初始化和渲染图表
     renderChart() {
       // 使用ref获取DOM元素
-      // let chartDom = this.$refs.chartContainer;
+      let chartDom = this.$refs.chartContainer;
       // 初始化ECharts实例
-      this.myChart = echarts.init(document.getElementById("echart"));
+      this.myChart = echarts.init(chartDom);
       this.myChart.setOption(this.chartOption);
     },
     //发送请求获取该页面所需要的数据

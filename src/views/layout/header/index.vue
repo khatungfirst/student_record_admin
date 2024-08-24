@@ -11,10 +11,10 @@
       <el-avatar style="width: 30px;height:30px;" :src="avatar"></el-avatar>
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
-          管理员：<span></span> <i class="el-icon-caret-bottom"></i>
+          {{ name }}<span></span> <i class="el-icon-caret-bottom"></i>
         </div>
         <el-dropdown-menu class="user-dropdown" slot="dropdown">
-          <router-link class="inlineBlock" to="/layout/desktop">
+          <router-link class="inlineBlock" to="/desktop">
             <el-dropdown-item>返回首页</el-dropdown-item>
           </router-link>
         </el-dropdown-menu>
@@ -37,6 +37,8 @@ export default {
       avatar:"",
       //折叠栏初始状态
       collapse: false,
+      //管理员的姓名
+      name:''
     };
   },
   mounted(){
@@ -50,6 +52,7 @@ export default {
     async init(){
       const data = await getDetailInfo()
       this.avatar = data.data.avatar
+      this.name = data.data.name
       this.$store.dispatch('user/permissionInto',data.data.perms)
     },
      //设置侧边栏折叠事件对应的方法
