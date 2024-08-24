@@ -8,7 +8,7 @@ console.log(router,'router');
 
 router.beforeEach((to, from, next) => {
   NProgress.start() // 开启Progress
-  if (localStorage.getItem('token')) {
+  if (sessionStorage.getItem('token')) {
       store.dispatch('menu/getMenuList').then(mybaseRoutes => {
           router.addRoutes([...mybaseRoutes],{ path: '*', redirect: '/404', hidden: true });    
           // next(to.path)
