@@ -4,7 +4,7 @@ import request from "../utils/request";
 export function getTeacherList(params) {
   return request({
     url: "/teacherManage/queryTeacher",
-    method: "get",
+    method: "post",
     data: params
   });
 }
@@ -38,12 +38,18 @@ export function deleteTeacher(username) {
 }
 
 // 删除多个老师
-export function deleteMultipleTeacher(data) {
-  return request({
-    url: "/teacherManage/deleteMultipleTeacher",
-    method: "post",
-    data
-  });
+// export function deleteMultipleTeacher(data) {
+//   return request({
+//     url: "/teacherManage/deleteMultipleTeacher",
+//     method: "post",
+//     data
+//   });
+// }
+export const deleteMultipleTeacher = (username) => {
+  return request.post(
+    "/teacherManage/deleteMultipleTeacher",
+    JSON.stringify(username)
+  );
 }
 
 // 封禁老师
@@ -51,6 +57,17 @@ export function banTeacher(username) {
   const data = { username: username };
   return request({
     url: "/teacherManage/banTeacher",
+    method: "post",
+    data
+  });
+}
+
+// 获取老师学号
+export function getUsername(data) {
+  // console.log(username,'=============');
+  //  const data = {username:username};
+  return request({
+    url: "/teacherManage/getUsername",
     method: "post",
     data
   });
