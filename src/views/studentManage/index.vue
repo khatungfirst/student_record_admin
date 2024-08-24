@@ -112,7 +112,7 @@
         </div>
       </div>
     </div>
-    <div id="middle" :style="{ display: display }">
+    <div id="middle" :style="{ display: display }" >
       <el-card class="box-card">
         <div slot="header" class="clearfix">
           <span>添加学生</span>
@@ -852,10 +852,18 @@ export default {
 
         .text-right {
           width: 50%;
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          padding-left: 20px;
+          overflow: hidden;
 
           .el-upload {
             width: 80%;
             padding: 1px;
+            position: absolute;
           }
 
           .el-upload__tip {
