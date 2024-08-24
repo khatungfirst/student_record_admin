@@ -55,15 +55,38 @@
               <p>批量导入</p>
               <el-upload class="upload-demo" drag
                 :accept="'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'"
-                action="/teacherManage/addMultipleTeacher" multiple>
+                action="/api/teacher/addMultipleTeacher" multiple :on-success="handleUploadSuccess"
+                :before-upload="beforeUpload">
                 <i class="el-icon-upload"></i>
-                <div class="el-upload__text">将Excel表格文件拖到此处，或<em>点击上传</em></div>
-                <div class="el-upload__tip" slot="tip">注：请按照模板格式填写Excel表格</div>
+                <div class="el-upload__text">
+                  将Excel表格文件拖到此处，或<em>点击上传</em>
+                </div>
+                <div class="el-upload__tip" slot="tip">
+                  注：只能上传excel表格(其中包含个人的班级、姓名、学号、密码)
+                  <p>
+                    示例
+                    <a style="text-decoration: underline; color: #409eff" @click="exampleOpen">请看这里</a>
+                  </p>
+                </div>
               </el-upload>
             </div>
+
+            <el-dialog 
+              title="按照下面的格式进行上传文件：" 
+              :visible.sync="cardDisplay" width="30%" 
+              :modal-append-to-body="false"
+              :append-to-body="true" 
+              :show-close="false" 
+              id="exampleId">
+              <img src="../../../static/img/example.png" style="width: 400px; height: 400px" />
+              <!-- <span slot="footer" class="dialog-footer"> -->
+              <el-button @click="exampleClose">我知道了</el-button>
+            </el-dialog>
+
           </div>
         </el-card>
       </div>
+
     </div>
     <div class="edit" :style="{ display: editDisplay }" ref="edit">
       <el-card class="box-card">
@@ -253,6 +276,8 @@ export default {
       multipleSelection: {},
       //存放多选选中数据的数组
       selectedArr: [],
+      //控制批量添加示例卡片的展示与否
+      cardDisplay: false,
     };
   },
   created() {
@@ -630,6 +655,26 @@ export default {
       // 可选：重新获取老师列表，更新页面显示
       // this.getTeacherList(this.searchParams);
     },
+    //示例窗口的出现
+    exampleOpen() {
+      this.cardDisplay = true
+      document.getElementById('exampleId').style = "pointer-events: auto;"
+    },
+
+    //示例窗口的消失
+    exampleClose() {
+      this.cardDisplay = false
+    },
+    // 示例窗口的出现
+    exampleOpen() {
+      this.cardDisplay = true;
+      document.getElementById('exampleId').style.pointerEvents = 'auto';
+    },
+
+    // 示例窗口的消失
+    exampleClose() {
+      this.cardDisplay = false;
+    },
   },
 };
 </script>
@@ -781,6 +826,25 @@ export default {
 
         .text-right {
           width: 50%;
+          position: relative;
+          top: -88px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          padding-left: 20px;
+          overflow: hidden;
+
+          .el-upload {
+            width: 80%;
+            padding: 1px;
+            position: absolute;
+          }
+
+          .el-upload__tip {
+            width: 80%;
+            margin: 20px auto;
+          }
         }
 
         p {
