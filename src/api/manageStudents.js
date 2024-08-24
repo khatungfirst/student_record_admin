@@ -24,33 +24,40 @@ export const singleAdd = (ruleForm) => {
 
 //3、批量导出
 export function exportData(selected_students) {
-    fetch('/api/stuManage/outputMultipleStudent',
+    fetch('http://192.168.21.36:8881/stuManage/outputMultipleStudent',
         {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'token':sessionStorage.getItem('token')
             },
-            body: JSON.stringify({selected_students:selected_students})
+            body: JSON.stringify({ selected_students: selected_students })
         }
-    ).then(response => response.blob()) // 处理响应，将其转换为blob
-    .then(blob => {
-      // 创建下载链接并触发下载
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'exported-data.xlsx'; // 设置下载文件名
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url); // 清理
-    })
-    .catch(error => console.error('导出失败:', error));
+    ).then(response => {
+        console.log(response,'res');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.blob();
+    }) // 处理响应，将其转换为blob
+        .then(blob => {
+            // 创建下载链接并触发下载
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'exported-data.xlsx'; // 设置下载文件名
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url); // 清理
+        })
+        .catch(error => console.error('导出失败:', error));
 }
 
 //4、设置管理员
-export const makeAdmin = (student,managerType) => {
+export const makeAdmin = (student, managerType) => {
     return request.post('/stuManage/setStudentManager', JSON.stringify(
-        { student, managerType}
+        { student, managerType }
     ),
         {
             headers: {

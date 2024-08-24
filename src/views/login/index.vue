@@ -134,7 +134,7 @@ export default {
             if (code === 200) {
               this.$store.dispatch("user/userInfo", data.data);
               this.$store.dispatch("user/tokenIn", data.data.token); //把token存到vuex中
-              this.$router.push("/layout/desktop");
+              this.$router.push("/");
             }
           } else {
             Message("验证码输入错误，请重新输入！");

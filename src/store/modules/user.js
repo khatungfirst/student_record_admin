@@ -34,9 +34,9 @@ const user = {
   actions: {
     // 将token存入
     tokenIn(store,context) {
-      localStorage.setItem('token',JSON.stringify(context))    
-      setToken(JSON.parse(localStorage.getItem('token')))
-      store.commit('SET_TOKEN', JSON.parse(localStorage.getItem('token')))
+      sessionStorage.setItem('token',JSON.stringify(context))    
+      setToken(JSON.parse(sessionStorage.getItem('token')))
+      store.commit('SET_TOKEN', JSON.parse(sessionStorage.getItem('token')))
     },
 
     //将登录用户的身份和username存入
@@ -59,7 +59,7 @@ const user = {
       store.commit('SET_TOKEN', '')
       store.commit('SET_USERINFO', {})
       removeToken()
-      localStorage.removeItem('token')
+      // sessionStorage.removeItem('token')
       localStorage.removeItem('userInfo')
       localStorage.removeItem('perm')
     },

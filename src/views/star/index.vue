@@ -100,7 +100,7 @@
             v-permission="'star:user:select'"
             >推选<i class="el-icon-s-promotion"></i
           ></el-button>
-          <el-button type="primary" @click="publicStar" v-permission="'star:user:public'">发布</el-button>
+          <el-button type="primary" @click="publicStar" v-permission="'star:user:public'" :disabled = publicButton>发布</el-button>
         </div>
       </div>
     </div>
@@ -184,6 +184,7 @@ export default {
       total: 0, //表格中总共有多少数据
       // selectionsTotal: 0, //表示已推选的人员总数
       buttonDisabled: false, //表示两个按钮是否被禁用
+      publicButton:true  //公布按钮是否展示
     };
   },
   async created() {
@@ -335,6 +336,7 @@ export default {
       this.mul = [];
       this.isAll = false
       this.initStar();
+      this.publicButton = false
     },
 
     //公布成长之星名单

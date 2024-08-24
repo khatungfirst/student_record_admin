@@ -7,8 +7,8 @@ Vue.use(Router)
 // import NotFound from '@/views/404'
 export const baseRoutes = [
   {
-    path: '/layout',
-    redirect:'/layout/desktop',
+    path: '/',
+    redirect:'/desktop',
     component: ()=>import('../views/layout/index.vue'),
     meta: {
       title: '后台',
@@ -27,7 +27,7 @@ export const baseRoutes = [
   },
   
   {
-    path: '/404',
+    path: '*',
     name: '404',
     component: NotFound,
     // hidden: true
@@ -37,7 +37,7 @@ export const baseRoutes = [
 
 export const routes = [
   {
-    path: '/',   
+    path: '/login',   
     name: 'login',
     component: ()=>import('../views/login/index.vue')
   },
@@ -49,6 +49,10 @@ const router = new Router({
   base: process.env.BASE_URL,
   routes
 })
+// const createRouter = () => ({
+//   //   scrollBehavior: () => ({ y: 0 }),
+// //   routes: constantRouterMap
+// })
 
 
 export default router
