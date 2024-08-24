@@ -28,7 +28,8 @@ export function exportData(selected_students) {
         {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'token':sessionStorage.getItem('token')
             },
             body: JSON.stringify({selected_students:selected_students})
         }

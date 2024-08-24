@@ -71,13 +71,8 @@
               </el-upload>
             </div>
 
-            <el-dialog 
-              title="按照下面的格式进行上传文件：" 
-              :visible.sync="cardDisplay" width="30%" 
-              :modal-append-to-body="false"
-              :append-to-body="true" 
-              :show-close="false" 
-              id="exampleId">
+            <el-dialog title="按照下面的格式进行上传文件：" :visible.sync="cardDisplay" width="30%" :modal-append-to-body="false"
+              :append-to-body="true" :show-close="false" id="exampleId">
               <img src="../../../static/img/example.png" style="width: 400px; height: 400px" />
               <!-- <span slot="footer" class="dialog-footer"> -->
               <el-button @click="exampleClose">我知道了</el-button>
@@ -102,7 +97,7 @@
             <el-input v-model="editInfo.name"></el-input>
           </el-form-item>
           <el-form-item label="性别">
-            <el-select v-model="editInfo.gender" placeholder="请选择性别">
+            <el-select v-model="editInfo.user_gender" placeholder="请选择性别">
               <el-option label="男" value="男"></el-option>
               <el-option label="女" value="女"></el-option>
             </el-select>
@@ -145,6 +140,7 @@
         </el-table-column>
         <el-table-column prop="username" label="手机号" show-overflow-tooltip align="center">
         </el-table-column>
+        <el-table-column prop="user_gender" label="性别" align="center"></el-table-column>
         <el-table-column prop="manager_type" label="管理员类型" show-overflow-tooltip align="center">
           <template slot-scope="scope">
             <!-- 根据 scope.row.manager_type 的值来显示文本 -->
@@ -234,7 +230,7 @@ export default {
       editInfo: {
         old_username: "",
         password: "",
-        gender:'',
+        user_gender:'',
         name:''
       },
       //用来存放用户选择下拉框中的值
@@ -328,6 +324,8 @@ export default {
     handleCurrentChange(val) {
       console.log(`当前页: ${val}`);
       this.currentPage = val;
+      // 重新获取当前页的数据
+      this.getTeacherList(this.searchParams);
     },
 
     // 仅更新输入框内容，不触发搜索
@@ -338,6 +336,8 @@ export default {
     // 组件中的 getTeacherList 方法
     async getTeacherList(searchParams) {
       try {
+        // 更新请求参数中的当前页码
+        searchParams.page = this.currentPage;
         // 打印请求参数
         console.log('Requesting teachers with:', this.searchParams);
         const response = await getTeacherList(searchParams);
@@ -402,7 +402,7 @@ export default {
         return;
       }
 
-      const action = scope.row.user_ban ? '解封' : '封禁';
+      const action = scope.row.user_ban ? '封禁' : '解封';
       banTeacher(scope.row.username)
         .then(response => {
           if (response.code === 200) {
@@ -506,7 +506,7 @@ export default {
       // 使用 scope.row 来获取当前行的数据
       this.editInfo = {
         name: scope.row.name,       // 姓名
-        gender: scope.row.gender,   // 性别
+        user_gender: scope.row.user_gender,   // 性别
         username: oldUsername, // 原始手机号
         old_username: oldUsername, // 更新后的手机号
         password: scope.row.password // 密码
