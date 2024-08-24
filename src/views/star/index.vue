@@ -346,6 +346,7 @@ export default {
       this.buttonDisabled = false;
       const data = await publicStar();
       this.initPublic(data);
+      this.initStar()
     },
 
     //重新选择
