@@ -41,8 +41,6 @@ Vue.directive('permission', {
     }
   }
 })
-
-
 new Vue({
   el: '#app',
   router,

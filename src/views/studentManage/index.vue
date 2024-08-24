@@ -94,7 +94,13 @@
             style="width: 65%"
           >
           </el-input>
-          <el-button type="primary" id="select" @click="init" v-permission="'user:student:query'">搜索</el-button>
+          <el-button
+            type="primary"
+            id="select"
+            @click="init"
+            v-permission="'user:student:query'"
+            >搜索</el-button
+          >
           <el-button type="success" plain id="add" @click="reloadStudents"
             >重置</el-button
           >
@@ -106,7 +112,7 @@
         </div>
       </div>
     </div>
-    <div id="middle" :style="{ display: display }">
+    <div id="middle" :style="{ display: display }" >
       <el-card class="box-card">
         <div slot="header" class="clearfix">
           <span>添加学生</span>
@@ -142,7 +148,7 @@
                 style="padding: 3px 0"
                 type="text"
                 @click="addSignalStudent"
-                 v-permission="'user:student:addSingleStudent'"
+                v-permission="'user:student:addsinglestudent'"
                 >单个添加</el-button
               >
             </div>
@@ -156,7 +162,7 @@
               action="/api/stuManage/addMultipleStudent"
               multiple
               :on-success="uploadSuccess"
-              v-permission="'user:student:addMultipleStudent'"
+              v-permission="'user:student:addMultiplestudent'"
             >
               <i class="el-icon-upload"></i>
               <div class="el-upload__text">
@@ -164,12 +170,36 @@
               </div>
               <div class="el-upload__tip" slot="tip">
                 注：只能上传excel表格(其中包含个人的班级、姓名、学号、密码)
+                <p>
+                  示例
+                  <a
+                    style="text-decoration: underline; color: #409eff"
+                    @click="exampleOpen"
+                    >请看这里</a
+                  >
+                </p>
               </div>
             </el-upload>
           </div>
         </div>
       </el-card>
     </div>
+    <el-dialog
+      title="按照下面的格式进行上传文件："
+      :visible.sync="cardDisplay"
+      width="30%"
+      :modal-append-to-body="false"
+      :append-to-body="true"
+      :show-close="false"
+      id="exampleId"
+    >
+      <img
+        src="../../../static/img/example.png"
+        style="width: 400px; height: 400px"
+      />
+      <!-- <span slot="footer" class="dialog-footer"> -->
+      <el-button @click="exampleClose">我知道了</el-button>
+    </el-dialog>
     <div class="edit" :style="{ display: editDisplay }" ref="edit">
       <el-card class="box-card">
         <div slot="header" class="clearfix">
@@ -194,7 +224,7 @@
           <el-form-item label="班级">
             <el-input v-model="editInfo.class"></el-input>
           </el-form-item>
-          <el-form-item label="电话号">
+          <el-form-item label="手机号">
             <el-input v-model="editInfo.telephone"></el-input>
           </el-form-item>
           <el-form-item label="密码">
@@ -208,7 +238,11 @@
         <p>学员列表</p>
         <div class="top-right">
           <!-- 设为管理员按钮 -->
-          <span class="el-dropdown-link" @click="deleteStudent" v-permission="'user:student:delete'">
+          <span
+            class="el-dropdown-link"
+            @click="deleteStudent"
+            v-permission="'user:student:delete'"
+          >
             批量删除
           </span>
 
@@ -332,14 +366,22 @@
             <el-dropdown
               trigger="click"
               placement="top-start"
-              @command="setAdmin($event,scope.row)"
+              @command="setAdmin($event, scope.row)"
               v-permission="'user:student:setManager'"
             >
-              <span class="el-dropdown-link" style="cursor: pointer;"> 设为管理员 </span>
+              <span class="el-dropdown-link" style="cursor: pointer">
+                设为管理员
+              </span>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item command="班级管理员" >班级管理员</el-dropdown-item>
-                <el-dropdown-item command="年级管理员">年级管理员</el-dropdown-item>
-                <el-dropdown-item command="取消管理员">取消管理员</el-dropdown-item>
+                <el-dropdown-item command="班级管理员"
+                  >班级管理员</el-dropdown-item
+                >
+                <el-dropdown-item command="年级管理员"
+                  >年级管理员</el-dropdown-item
+                >
+                <el-dropdown-item command="取消管理员"
+                  >取消管理员</el-dropdown-item
+                >
               </el-dropdown-menu>
             </el-dropdown>
           </template>
@@ -348,7 +390,9 @@
 
       <!-- 分页 -->
       <div class="paginatio">
-        <span @click="exportInfo" v-permission="'user:student:edit'">批量导出</span>
+        <span @click="exportInfo" v-permission="'user:student:edit'"
+          >批量导出</span
+        >
         <el-pagination
           @current-change="handleCurrentChange"
           :current-page.sync="initInfo.page"
@@ -372,7 +416,7 @@ import { exportData } from "../../api/manageStudents";
 import { studentInfo } from "../../api/manageStudents";
 import { pageData } from "../../api/manageStudents";
 export default {
-  name:'studentmanage',
+  name: "studentmanage",
   data() {
     return {
       //用于接收后端传来的下拉框中的选项
@@ -454,6 +498,8 @@ export default {
       role: "",
       //当前页的数据长度
       pageLength: 0,
+      //控制批量添加示例卡片的展示与否
+      cardDisplay: false,
     };
   },
   async mounted() {
@@ -606,7 +652,7 @@ export default {
     },
 
     //设为管理员
-    async setAdmin(command,row) {
+    async setAdmin(command, row) {
       console.log(row, "command");
       // let managerType = "";
       // if (command === "class") {
@@ -638,6 +684,17 @@ export default {
         return "否";
       }
     },
+
+    //示例窗口的出现
+    exampleOpen(){
+      this.cardDisplay = true
+      document.getElementById('exampleId').style = "pointer-events: auto;"
+    },
+
+    //示例窗口的消失
+    exampleClose(){
+      this.cardDisplay = false
+    }
   },
 };
 </script>
@@ -649,6 +706,11 @@ export default {
   width: 100%;
   height: 95%;
   position: relative;
+
+  .el-dialog {
+    z-index: 9999;
+    pointer-events: auto;
+  }
 
   .top {
     margin: 2vh 0px;
@@ -725,7 +787,6 @@ export default {
     transform: translate(-50%, -50%);
     z-index: 999;
     pointer-events: none;
-
     .el-card {
       height: 100%;
       pointer-events: auto;
@@ -791,10 +852,18 @@ export default {
 
         .text-right {
           width: 50%;
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          padding-left: 20px;
+          overflow: hidden;
 
           .el-upload {
             width: 80%;
             padding: 1px;
+            position: absolute;
           }
 
           .el-upload__tip {

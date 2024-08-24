@@ -45,7 +45,7 @@
             style="background-color: rgb(254, 164, 90)"
           >
             <template #icon>
-              <i class="iconfont">&#xe620;</i>
+              <i class="iconfont">&#xe70d;</i>
             </template>
             <template #text1>
               <p>今日访客数</p>
@@ -66,7 +66,7 @@
             style="background-color: rgb(254, 115, 100)"
           >
             <template #icon>
-              <i class="iconfont">&#xe70d;</i>
+              <i class="iconfont">&#xe620;</i>
             </template>
             <template #text1>
               <p>人员总数</p>
@@ -135,20 +135,20 @@
         <el-row>
           <el-col :span="12">
             <div class="img" style="background-color: #f3d026">
-              <i class="el-icon-s-order"></i>
+              <i class="el-icon-thumb"></i>
             </div>
             <div class="text">
-              <p>总贴数</p>
-              <p>{{ articleReadTotal }}</p>
+              <p>总赞数</p>
+              <p>{{ likeTotal }}</p>
             </div>
           </el-col>
           <el-col :span="12">
             <div class="img" style="background-color: #03b4fd">
-              <i class="el-icon-s-management"></i>
+              <i class="el-icon-view"></i>
             </div>
             <div class="text">
               <p>总阅读数</p>
-              <p>{{ likeTotal }}</p>
+              <p>{{ articleReadTotal }}</p>
             </div>
           </el-col>
         </el-row>
@@ -186,9 +186,6 @@ export default {
       //柱形图中的数据
       chartOption: {},
     };
-  },
-  computed: {
-    // ...mapGetters({role:'user/roles'}),
   },
   created() {
     // this.handleListener();
@@ -253,13 +250,16 @@ export default {
       this.articleReadTotal = data.article_read_total;
       this.likeTotal = data.upvote_amount;
       this.chartOption = data.chartOption;
-      console.log(this.chartOption,'--------------');
-      
+      console.log(this.chartOption, "--------------");
+
       this.renderChart();
     },
 
     //根据日期查询对应的柱状图数据
     async dateCheck() {
+      if (this.date === null) {
+        this.date = "";
+      }
       const chartOption = await updateHistogramInfo(this.date);
       this.chartOption = chartOption.data.chartOption;
       console.log(this.chartOption, "chart");
@@ -268,7 +268,6 @@ export default {
         this.myChart.dispose();
         this.renderChart();
       }
-
     },
   },
   beforeDestroy() {
@@ -358,8 +357,8 @@ export default {
       display: flex;
       justify-content: space-around;
       margin-bottom: 2vh;
-      padding: 2vh;
-      flex: 1 0 200px; /* flex-grow、flex-shrink 和 flex-basis */
+      padding: 10px;
+      flex: 1 0 280px; /* flex-grow、flex-shrink 和 flex-basis */
       transition: 0.6s ease;
 
       i {
