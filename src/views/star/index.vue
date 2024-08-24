@@ -194,19 +194,17 @@ export default {
   methods: {
     //初始化界面的数据
     async initStar() {
+      console.log('------------------------------');
+      
       this.page = JSON.parse(localStorage.getItem("starPage"));
       const data = await initStar(this.limit, this.page, this.search);
-      console.log(data, "data");
       if (data.data !== null) {
         this.tableData = data.data.tableData;
         this.table = this.tableData;
         this.total = data.data.total;
-        this.maxSelectedCount = data.data.peopleLimit;
-        console.log(this.maxSelectedCount,'1111');       
+        this.maxSelectedCount = data.data.peopleLimit;      
         this.buttonDisabled = data.data.isDisabled
         this.search = "";
-        console.log(this.table, "table");
-        console.log(this.mul, "mul");
         //显示已选中用户的选中状态
         this.table.map((item, index) => {
           const existingItem = this.mul.find(
@@ -276,16 +274,13 @@ export default {
       const existingItem = this.mul.find(
         (item) => item.username === val.username
       );
-      console.log(existingItem, "val");
       //判断用户是勾选还是取消勾选
       if (!existingItem) {
         this.multipleSelection = val;
         if (this.mul.length < this.maxSelectedCount) {
-          console.log(this.isAdd, "add");
           // 将这些新对象添加到mul数组中
           this.mul.push(this.multipleSelection);
           this.remainder = this.maxSelectedCount - this.mul.length;
-          console.log(this.mul, "length");
           if (this.mul.length === this.tableData.length) {
             this.isAll = true;
           }
@@ -295,7 +290,6 @@ export default {
             });
             this.isDisabled = true;
           }
-          console.log(this.remainder, "剩余");
         } else {
           Message({
             message: "名额已经选满喽，推选无效~",
@@ -328,6 +322,8 @@ export default {
             if (
               data.data === 'No seats left'
             ) {
+              console.log('禁用按钮');
+              
               await optional();
               this.buttonDisabled = true;
               Message({
@@ -343,10 +339,10 @@ export default {
 
     //公布成长之星名单
     async publicStar() {
+      this.initStar()
       this.buttonDisabled = false;
       const data = await publicStar();
       this.initPublic(data);
-      this.initStar()
     },
 
     //重新选择
