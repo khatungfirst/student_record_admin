@@ -416,6 +416,7 @@ import { Message } from "element-ui"; // MessageBox
 import { exportData } from "../../api/manageStudents";
 import { studentInfo } from "../../api/manageStudents";
 import { pageData } from "../../api/manageStudents";
+import { getToken } from '@/utils/auth'
 export default {
   name: "studentmanage",
   data() {
@@ -502,7 +503,7 @@ export default {
       //控制批量添加示例卡片的展示与否
       cardDisplay: false,
       headerObj: {
-        token: sessionStorage.getItem("token"),
+        'token': getToken() ||  sessionStorage.getItem("token"),
       },
     };
   },
@@ -515,9 +516,7 @@ export default {
     async init() {
       this.role = JSON.parse(localStorage.getItem("userInfo")).role;
       this.initInfo.page = JSON.parse(localStorage.getItem("page"));
-      console.log(this.initInfo, "page");
       const data = await studentInfo(this.initInfo, this.role);
-      console.log(data, "请求");
       if (data.data !== null) {
         this.tableData = data.data.stuInfo;
         this.yearOptions = data.data.year;

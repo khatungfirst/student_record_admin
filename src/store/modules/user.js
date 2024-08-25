@@ -26,7 +26,6 @@ const user = {
     },
     SET_PERMISSION:(state,perm) => { 
       state.permission = perm
-      console.log(perm,'permmmmm');
       
     }
   },
