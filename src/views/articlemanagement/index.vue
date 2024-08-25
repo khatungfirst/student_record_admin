@@ -11,12 +11,12 @@
         <el-form-item label="是否被封禁">
           <el-select v-model="searchForm.article_ban" placeholder="请选择">
             <el-option label="请选择" value></el-option> <!-- 空值用于重置选项 -->
-            <el-option label="封禁" value=true></el-option>
-            <el-option label="正常" value=false></el-option>
+            <el-option label="封禁" :value="true"></el-option> <!-- 使用 :value 绑定布尔值 -->
+            <el-option label="正常" :value="false"></el-option> <!-- 使用 :value 绑定布尔值 -->
           </el-select>
         </el-form-item>
         <el-form-item label="发布人">
-          <el-input v-model="searchForm.username" placeholder="请输入发布人"></el-input>
+          <el-input v-model="searchForm.name" placeholder="请输入发布人"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">搜索</el-button>
@@ -37,7 +37,7 @@
       </el-table-column>
       <el-table-column prop="upvote_amount" label="点赞数" sortable="true"></el-table-column>
       <el-table-column prop="comment_amount" label="收藏数" sortable="true"></el-table-column>
-      <el-table-column prop="username" label=" 发布人"></el-table-column>
+      <el-table-column prop="name" label=" 发布人"></el-table-column>
       <el-table-column prop="created_at" label="发布时间" sortable="true"></el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
@@ -48,17 +48,24 @@
       </el-table-column>
     </el-table>
     <!-- 弹窗组件 -->
-    <el-dialog v-model="dialogVisible" title="帖子详情" :visible.sync="dialogVisible">
+    <el-dialog v-model="dialogVisible" title="帖子详情" :visible.sync="dialogVisible" :modal-append-to-body="false"
+      :append-to-body="true">
       <div v-if="articleDetail">
-        <p>帖子ID: {{ articleDetail.article_id }}</p>
-        <p>帖子内容: {{ articleDetail.article_content }}</p>
+        <p>
+          <!-- 使用 v-for 指令遍历 article_tags 数组 -->
+          <span v-for="(tag, index) in articleDetail.article_tags" :key="index" class="tag-style">
+            {{ tag }}
+            <!-- 如果不是最后一个元素，添加一个逗号 -->
+            <span v-if="index < articleDetail.article_tags.length - 1">, </span>
+          </span>
+        </p>
+        <p>帖子内容: {{ articleDetail.article_content.article_text }}</p>
         <!-- 这里可以添加更多的帖子详情展示 -->
       </div>
     </el-dialog>
     <div class="pagination">
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage"
-        :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
-        :total="totalPosts">
+        :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="totalPosts">
       </el-pagination>
     </div>
   </div>
@@ -73,7 +80,7 @@ export default {
       searchForm: {
         publishTime: [], // 发布时间范围
         article_ban: false, // 是否被封禁，可以是 'true'、'false' 或 ''（未选择）
-        username: ''   // 发布人
+        name: ''   // 发布人
       },
       currentPage: 1,
       pageSize: 10,
@@ -171,7 +178,7 @@ export default {
         end_at: this.searchForm.publishTime[1] || '',
         topic: '',                   // 假设没有提供话题筛选，留空
         key_words: '',               // 假设没有提供关键词筛选，留空
-        username: this.searchForm.username,   // 发布人名称
+        name: this.searchForm.name,   // 发布人名称
         article_ban: this.searchForm.article_ban === '' ? undefined : this.searchForm.article_ban, // 如果是空字符串，则不发送该字段
       };
       // 使用 fetchPosts 方法发送请求，并传递 postData 对象
@@ -182,7 +189,7 @@ export default {
       this.searchForm = {
         publishTime: [], // 重置发布时间范围
         article_ban: false, // 重置是否被封禁选项
-        username: ''    // 重置发布人
+        name: ''    // 重置发布人
       };
       this.sort = 'created_at'; // 重置默认排序属性
       this.order = 'desc'; // 重置默认排序顺序
@@ -203,7 +210,7 @@ export default {
       try {
         const article_id = row.article_id;
         // 假设 row.article_ban 已经是布尔值，如果不是，需要转换
-        const article_ban = row.article_ban === 'true' ? true : false;
+        const article_ban = row.article_ban === true ? true : false;
         await articleBan(article_id, article_ban);
         this.$message.success("封禁帖子成功");
         // 封禁当前帖子后，重新获取当前页面的数据
@@ -239,11 +246,22 @@ export default {
     },
     handleSizeChange(newSize) {
       this.pageSize = newSize;
-      // 可以在这里调用API或更新每页显示的数据量
+      this.currentPage = 1; // 改变每页条目数时，重置当前页为第一页
+      this.fetchPosts({
+        page: this.currentPage,
+        limit: this.pageSize,
+        sort: this.sort,
+        order: this.order,
+      });
     },
     handleCurrentChange(newPage) {
       this.currentPage = newPage;
-      // 可以在这里调用API或更新当前页的数据
+      this.fetchPosts({
+        page: this.currentPage,
+        limit: this.pageSize,
+        sort: this.sort,
+        order: this.order,
+      });
     },
     // 更改排序状态并重新获取数据
     changeSort(property) {

@@ -606,6 +606,7 @@ export default {
     //关闭添加学生的窗口
     close() {
       this.display = "none";
+      console.log();
       document.body.style = "pointer-events: auto;";
     },
 
