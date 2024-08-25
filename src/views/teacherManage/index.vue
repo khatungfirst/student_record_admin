@@ -428,6 +428,8 @@ export default {
 
     //关闭添加老师的窗口
     close() {
+      console.log('关闭');
+      
       this.display = "none";
       document.body.style = "pointer-events: auto;";
     },
@@ -825,13 +827,12 @@ export default {
 
         .text-right {
           width: 50%;
-          position: relative;
-          top: -88px;
+          height: 60%;
           display: flex;
           align-items: center;
           justify-content: center;
           flex-direction: column;
-          padding-left: 20px;
+          // padding-left: 20px;
           overflow: hidden;
 
           .el-upload {
@@ -842,7 +843,7 @@ export default {
 
           .el-upload__tip {
             width: 80%;
-            margin: 20px auto;
+            margin: 10px auto;
           }
         }
 
