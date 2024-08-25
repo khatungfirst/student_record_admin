@@ -597,14 +597,16 @@ export default {
     },
 
     //批量上传学生信息的相关方法
-    uploadSuccess() {
+    uploadSuccess(response, file, fileList) {
       Message({
         icon: "el-icon-check",
-        message: "上传成功",
+        message: response.msg,
         duration: 1000,
       });
       this.init();
     },
+
+    handleSuccess(){},
 
     //关闭添加学生的窗口
     close() {
