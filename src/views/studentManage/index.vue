@@ -112,7 +112,7 @@
         </div>
       </div>
     </div>
-    <div id="middle" :style="{ display: display }" >
+    <div id="middle" :style="{ display: display }">
       <el-card class="box-card">
         <div slot="header" class="clearfix">
           <span>添加学生</span>
@@ -159,10 +159,11 @@
               class="upload-demo"
               drag
               :accept="'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'"
-              action="http://192.168.10.7:8881/stuManage/addMultipleStudent"
+              action=""
               multiple
               :on-success="uploadSuccess"
               v-permission="'user:student:addMultiplestudent'"
+              :http-request="customHttpRequest"
             >
               <i class="el-icon-upload"></i>
               <div class="el-upload__text">
@@ -415,6 +416,7 @@ import { Message } from "element-ui"; // MessageBox
 import { exportData } from "../../api/manageStudents";
 import { studentInfo } from "../../api/manageStudents";
 import { pageData } from "../../api/manageStudents";
+import request from "../../utils/request";
 export default {
   name: "studentmanage",
   data() {
@@ -525,9 +527,44 @@ export default {
       }
     },
 
+    customHttpRequest(param) {
+      // 创建 FormData 实例，用于存储要发送的数据
+      const formData = new FormData();
+      // 将文件添加到 formData
+      formData.append("file", param.file);
+
+      // 配置请求头
+      const config = {
+        headers: {
+          'token': sessionStorage.getItem("token"), // 示例：添加认证Token
+        },
+      };
+
+      request
+        .post(
+          "http://192.168.10.7:8881/stuManage/addMultipleStudent",
+          formData,
+          config
+        )
+        .then((response) => {
+          // 处理成功响应
+          this.uploadSuccess(response, param.file, param.fileList);
+        })
+        .catch((error) => {
+          // 处理错误
+          console.error("Upload error:", error);
+        });
+    },
+    // uploadSuccess(response, file, fileList) {
+    //   // 自定义的上传成功回调
+    //   console.log('File uploaded successfully:', file.name);
+    //   // 可以根据响应结果更新 UI 或做其他处理
+    // }
+    // }  ,
+
     //将这个选中的行数据数组赋值给 multipleSelection 变量
     handleSelectionChange(val) {
-      this.selectedArr = val
+      this.selectedArr = val;
       // const existingItem = this.selectedArr.find(
       //   (item) => item.username === val[val.length-1].username
       // );
@@ -687,15 +724,15 @@ export default {
     },
 
     //示例窗口的出现
-    exampleOpen(){
-      this.cardDisplay = true
-      document.getElementById('exampleId').style = "pointer-events: auto;"
+    exampleOpen() {
+      this.cardDisplay = true;
+      document.getElementById("exampleId").style = "pointer-events: auto;";
     },
 
     //示例窗口的消失
-    exampleClose(){
-      this.cardDisplay = false
-    }
+    exampleClose() {
+      this.cardDisplay = false;
+    },
   },
 };
 </script>
