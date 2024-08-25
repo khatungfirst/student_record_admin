@@ -33,7 +33,7 @@
           </div>
 
           <!-- 文章详情弹窗 -->
-          <el-dialog :visible.sync="dialogVisible" title="文章详情">
+          <el-dialog :visible.sync="dialogVisible" title="文章详情" :modal-append-to-body="false">
             <div v-if="articleDetail">
               <p>{{ articleDetail }}</p>
             </div>
@@ -183,7 +183,7 @@ export default {
       getArticleDetail(article.article_id, this.username).then(response => {
         console.log(data);
         if (response.code === 200) {
-          this.articleDetail = response.data.article_content;
+          this.articleDetail = response.data.article_content.article_text;
           this.dialogVisible = true;
           console.log("Article detail retrieved:", this.articleDetail);
         } else {

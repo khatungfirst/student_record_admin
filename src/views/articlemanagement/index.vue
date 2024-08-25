@@ -48,7 +48,8 @@
       </el-table-column>
     </el-table>
     <!-- 弹窗组件 -->
-    <el-dialog v-model="dialogVisible" title="帖子详情" :visible.sync="dialogVisible">
+    <el-dialog v-model="dialogVisible" title="帖子详情" :visible.sync="dialogVisible" :modal-append-to-body="false"
+      :append-to-body="true">
       <div v-if="articleDetail">
         <p>
           <!-- 使用 v-for 指令遍历 article_tags 数组 -->
