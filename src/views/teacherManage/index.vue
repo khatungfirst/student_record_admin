@@ -55,8 +55,7 @@
               <p>批量导入</p>
               <el-upload class="upload-demo" drag
                 :accept="'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'"
-                action="/api/teacher/addMultipleTeacher" multiple :on-success="handleUploadSuccess"
-                :before-upload="beforeUpload">
+                action="/api/teacher/addMultipleTeacher" multiple>
                 <i class="el-icon-upload"></i>
                 <div class="el-upload__text">
                   将Excel表格文件拖到此处，或<em>点击上传</em>

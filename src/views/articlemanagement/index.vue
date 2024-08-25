@@ -9,7 +9,7 @@
           </el-date-picker>
         </el-form-item>
         <el-form-item label="是否被封禁">
-          <el-select v-model="searchForm.article_ban" placeholder="请选择" @change="handleArticleBanChange">
+          <el-select v-model="searchForm.article_ban" placeholder="请选择">
             <el-option label="请选择" value></el-option> <!-- 空值用于重置选项 -->
             <el-option label="封禁" :value="true"></el-option> <!-- 使用 :value 绑定布尔值 -->
             <el-option label="正常" :value="false"></el-option> <!-- 使用 :value 绑定布尔值 -->
@@ -50,8 +50,15 @@
     <!-- 弹窗组件 -->
     <el-dialog v-model="dialogVisible" title="帖子详情" :visible.sync="dialogVisible">
       <div v-if="articleDetail">
-        <p>帖子ID: {{ articleDetail.article_id }}</p>
-        <p>帖子内容: {{ articleDetail.article_content }}</p>
+        <p>
+          <!-- 使用 v-for 指令遍历 article_tags 数组 -->
+          <span v-for="(tag, index) in articleDetail.article_tags" :key="index" class="tag-style">
+            {{ tag }}
+            <!-- 如果不是最后一个元素，添加一个逗号 -->
+            <span v-if="index < articleDetail.article_tags.length - 1">, </span>
+          </span>
+        </p>
+        <p>帖子内容: {{ articleDetail.article_content.article_text }}</p>
         <!-- 这里可以添加更多的帖子详情展示 -->
       </div>
     </el-dialog>
@@ -130,7 +137,7 @@ export default {
     async showArticleDetail(row) {
       try {
         console.log('我是row',row);
-        const response = await getArticleDetail(row.article_id, row.name);
+        const response = await getArticleDetail(row.article_id, row.username);
         console.log('我是response', response);
         console.log(row.article_id);
         if (response && response.code === 200) {
