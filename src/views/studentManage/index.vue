@@ -112,7 +112,7 @@
         </div>
       </div>
     </div>
-    <div id="middle" :style="{ display: display }" >
+    <div id="middle" :style="{ display: display }">
       <el-card class="box-card">
         <div slot="header" class="clearfix">
           <span>添加学生</span>
@@ -163,7 +163,7 @@
               multiple
               :on-success="uploadSuccess"
               v-permission="'user:student:addMultiplestudent'"
-   
+              :headers="headerObj"
             >
               <i class="el-icon-upload"></i>
               <div class="el-upload__text">
@@ -501,6 +501,9 @@ export default {
       pageLength: 0,
       //控制批量添加示例卡片的展示与否
       cardDisplay: false,
+      headerObj: {
+        token: sessionStorage.getItem("token"),
+      },
     };
   },
   async mounted() {
@@ -528,7 +531,7 @@ export default {
 
     //将这个选中的行数据数组赋值给 multipleSelection 变量
     handleSelectionChange(val) {
-      this.selectedArr = val
+      this.selectedArr = val;
       // const existingItem = this.selectedArr.find(
       //   (item) => item.username === val[val.length-1].username
       // );
@@ -688,15 +691,15 @@ export default {
     },
 
     //示例窗口的出现
-    exampleOpen(){
-      this.cardDisplay = true
-      document.getElementById('exampleId').style = "pointer-events: auto;"
+    exampleOpen() {
+      this.cardDisplay = true;
+      document.getElementById("exampleId").style = "pointer-events: auto;";
     },
 
     //示例窗口的消失
-    exampleClose(){
-      this.cardDisplay = false
-    }
+    exampleClose() {
+      this.cardDisplay = false;
+    },
   },
 };
 </script>
