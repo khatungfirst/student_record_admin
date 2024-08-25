@@ -159,7 +159,7 @@
               class="upload-demo"
               drag
               :accept="'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'"
-              action="/api/stuManage/addMultipleStudent"
+              action="http://192.168.10.7:8881/stuManage/addMultipleStudent"
               multiple
               :on-success="uploadSuccess"
               v-permission="'user:student:addMultiplestudent'"
