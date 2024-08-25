@@ -83,7 +83,6 @@ export default {
     async init() {
       const initData = await initSidebar();
       const data = initData.data;
-      console.log(data, "&&&&");
       const result = [];
       const map = new Map();
       for (const item of data) {
@@ -98,7 +97,6 @@ export default {
         }
       }
       this.sidebarData = result;
-      console.log(this.sidebarData, "sidebarData111");
     },
     // handleMenuSelect(val) {
     //   // debugger;
