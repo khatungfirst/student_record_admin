@@ -163,7 +163,7 @@
               multiple
               :on-success="uploadSuccess"
               v-permission="'user:student:addMultiplestudent'"
-              :headers = "{'token':sessionStorage.getItem('token')}"
+   
             >
               <i class="el-icon-upload"></i>
               <div class="el-upload__text">
