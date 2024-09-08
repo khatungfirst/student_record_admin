@@ -26,24 +26,32 @@
     </div>
     <el-table :data="postList" style="width: 100%" @sort-change="changeSort">
       <el-table-column prop="article_id" label="帖子ID" width="120"></el-table-column>
-      <el-table-column prop="article_content" label="帖子内容"></el-table-column>
-      <el-table-column prop="article_ban" label="状态">
-        <!-- 自定义列结构 -->
+      <el-table-column prop="article_content" label="帖子内容" class="content-ellipsis">
         <template v-slot="{ row }">
-          <!-- 根据row的article_ban的不同状态来显示不同的文本 -->
-          <span v-if="row.article_ban === true">封禁</span>
-          <span v-else>正常</span>
+          <div class="content-ellipsis">{{ row.article_content }}</div>
         </template>
       </el-table-column>
-      <el-table-column prop="upvote_amount" label="点赞数" sortable="true"></el-table-column>
+      <el-table-column prop="article_ban" label="状态">
+        <template v-slot="{ row }">
+          <i :class="row.article_ban ? 'el-icon-lock' : 'el-icon-circle-check'" class="status-icon"></i>
+          <span :class="row.article_ban ? 'banned' : 'normal'">
+            {{ row.article_ban ? '封禁' : '正常' }}
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="upvote_amount" label="点赞数" sortable="true" order="asc"></el-table-column>
       <el-table-column prop="comment_amount" label="收藏数" sortable="true"></el-table-column>
       <el-table-column prop="name" label=" 发布人"></el-table-column>
-      <el-table-column prop="created_at" label="发布时间" sortable="true"></el-table-column>
+      <el-table-column prop="created_at" label="发布时间" sortable="true">
+        <template slot-scope="scope">
+          <span>{{ formatDateTime(scope.row.created_at) }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
           <el-button type="text" @click="handleBan(scope.row)">封禁</el-button>
-          <el-button type="text" @click="handleDel(scope.row)">删除</el-button>
-          <el-button type="text" @click="showArticleDetail(scope.row)">查看详情</el-button>
+          <el-button type="text" @click="handleDel(scope.row)" class="delete-button">删除</el-button>
+          <el-button type="text" @click="showArticleDetail(scope.row)" class="detail-button">查看详情</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -64,8 +72,8 @@
       </div>
     </el-dialog>
     <div class="pagination">
-      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage"
-        :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="totalPosts">
+      <el-pagination @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-size="pageSize"
+        layout="total, prev, pager, next" :total="totalPosts">
       </el-pagination>
     </div>
   </div>
@@ -82,8 +90,8 @@ export default {
         article_ban: false, // 是否被封禁，可以是 'true'、'false' 或 ''（未选择）
         name: ''   // 发布人
       },
-      currentPage: 1,
-      pageSize: 10,
+      currentPage: 1, // 当前页码
+      pageSize: 10, // 每页显示条数
       totalPosts: 0,
       postList: [],
       dialogVisible: false, // 控制弹窗的显示
@@ -92,6 +100,7 @@ export default {
       order: 'desc', // 默认排序顺序
       topic:'',
       key_words: "",
+      currentSortColumn: 'upvote_amount', // 默认排序列
     };
   },
   computed: {
@@ -107,12 +116,31 @@ export default {
     this.handleSearch();
   },
   methods: {
+    // 格式化日期时间的方法
+    formatDateTime(created_at) {
+      const date = new Date(created_at);
+      if (isNaN(date.getTime())) {
+        console.error('无效的日期:', created_at); // 如果日期无效，输出错误信息
+        return '无效的日期';
+      }
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0'); // 月份从0开始，所以加1
+      const day = date.getDate().toString().padStart(2, '0');
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      const seconds = date.getSeconds().toString().padStart(2, '0');
+
+      // 构建新的日期时间字符串
+      const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`; // 如果需要毫秒，可以加上 .${date.getMilliseconds()}
+      return formattedDateTime;
+    },
     async fetchPosts(postData) {
       try {
         const response = await getArticleList(postData);
         console.log("我是帖子列表L:", response);
         if (response && response.code === 200) {
           this.updatePostList(response.data);
+          this.totalPosts = response.data.article_amount; // 后端返回的响应中包含总数据条数
         } else {
           throw new Error('API request failed with code: ' + response.code);
         }
@@ -137,7 +165,7 @@ export default {
     // 查看文章详情的方法
     async showArticleDetail(row) {
       try {
-        console.log('我是row',row);
+        console.log('我是row', row);
         const response = await getArticleDetail(row.article_id, row.username);
         console.log('我是response', response);
         console.log(row.article_id);
@@ -261,17 +289,37 @@ export default {
         limit: this.pageSize,
         sort: this.sort,
         order: this.order,
+        // 其他搜索参数
       });
     },
+    handleSortChange(property) {
+      this.currentSortColumn = property;
+      this.changeSort(property);
+    },
     // 更改排序状态并重新获取数据
-    changeSort(property) {
-      if (this.sort === property) {
-        this.order = this.order === 'asc' ? 'desc' : 'asc';
-      } else {
-        this.sort = property;
-        this.order = 'asc'; // 设置默认排序顺序
+    changeSort({ prop, order }) {
+      // 根据点击的列更新 sort 属性
+      let sortField = 'created_at'; // 默认排序字段
+      switch (prop) {
+        case "upvote_amount":
+          sortField = "like_amount";
+          break;
+        case "comment_amount":
+          sortField = "collect_amount";
+          break;
+        case "created_at":
+          sortField = "created_at";
+          break;
+        // 如果需要，可以添加更多 case
       }
-      // 使用当前页和页面大小重新获取数据
+
+      // 更新排序字段
+      this.sort = sortField;
+
+      // 根据排序方向更新 order
+      this.order = order === "ascending" ? "asc" : order === "descending" ? "desc" : "asc";
+
+      // 重新获取数据
       this.fetchPosts({
         page: this.currentPage,
         limit: this.pageSize,
@@ -304,5 +352,37 @@ export default {
 .pagination {
   margin-top: 20px;
   text-align: right;
+}
+
+.content-ellipsis {
+  max-width: 82%;
+  /* 根据需要调整最大宽度 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status-icon {
+  margin-right: 5px;
+  /* 图标和文本之间的间距 */
+}
+
+.banned {
+  color: #b63636;
+  /* 封禁状态的文本颜色 */
+}
+
+.normal {
+  color: rgb(71, 150, 112);
+  /* 正常状态的文本颜色 */
+}
+
+.delete-button {
+  color: #b63636;
+  /* 设置文字颜色 */
+}
+
+.detail-button {
+  color: rgb(71, 150, 112);
 }
 </style>

@@ -37,14 +37,23 @@
             <div class="text-left">
               <p>单个添加</p>
               <el-form :model="ruleForm" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+                <el-form-item label="姓名" prop="name" label-width="50px">
+                  <el-input v-model="ruleForm.name"></el-input>
+                </el-form-item>
+                <!-- <el-form-item label="性别" prop="user_gender" label-width="50px">
+                  <el-input v-model="ruleForm.user_gender"></el-input>
+                </el-form-item> -->
+                <el-form-item label="性别" prop="user_gender" label-width="50px">
+                  <el-select v-model="ruleForm.user_gender" placeholder="请选择性别" @change="handleGenderChange">
+                    <el-option label="男" value="男"></el-option>
+                    <el-option label="女" value="女"></el-option>
+                  </el-select>
+                </el-form-item>
                 <el-form-item label="账号" prop="username" label-width="50px">
                   <el-input v-model="ruleForm.username"></el-input>
                 </el-form-item>
                 <el-form-item label="密码" prop="password" label-width="50px">
                   <el-input v-model="ruleForm.password"></el-input>
-                </el-form-item>
-                <el-form-item label="姓名" prop="name" label-width="50px">
-                  <el-input v-model="ruleForm.name"></el-input>
                 </el-form-item>
               </el-form>
               <div class="signal-button">
@@ -118,10 +127,10 @@
           <el-dropdown trigger="click" @command="handleSetManager">
             <span class="el-dropdown-link"> 设为管理员 </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="grade1">大一管理员</el-dropdown-item>
-              <el-dropdown-item command="grade2">大二管理员</el-dropdown-item>
-              <el-dropdown-item command="grade3">大三管理员</el-dropdown-item>
-              <el-dropdown-item command="grade4">大四管理员</el-dropdown-item>
+              <el-dropdown-item command="大一管理员">大一管理员</el-dropdown-item>
+              <el-dropdown-item command="大二管理员">大二管理员</el-dropdown-item>
+              <el-dropdown-item command="大三管理员">大三管理员</el-dropdown-item>
+              <el-dropdown-item command="大四管理员">大四管理员</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
 
@@ -144,7 +153,7 @@
           <template slot-scope="scope">
             <!-- 根据 scope.row.manager_type 的值来显示文本 -->
             <!-- 使用 v-else-if 和 v-else 链式结构 -->
-            <span v-if="scope.row.manager_type === '大一管理员'">大一管理员</span>
+            <span v-if="scope.row.manager_type === '年级管理员'">大一管理员</span>
             <span v-else-if="scope.row.manager_type === '大二管理员'">大二管理员</span>
             <span v-else-if="scope.row.manager_type === '大三管理员'">大三管理员</span>
             <span v-else-if="scope.row.manager_type === '大四管理员'">大四管理员</span>
@@ -259,6 +268,7 @@ export default {
         username: "",
         password: "",
         name: "",
+        user_gender:''
       },
       searchParams: {
         search_select: "",
@@ -676,6 +686,9 @@ export default {
     exampleClose() {
       this.cardDisplay = false;
     },
+    handleGenderChange(value) {
+      console.log('Selected gender:', value);
+    },
   },
 };
 </script>
@@ -795,7 +808,7 @@ export default {
 
         .text-left {
           width: 50%;
-          height: 60%;
+          height: 70%;
           border-right: 1px solid rgb(130, 127, 127);
           padding-right: 5%;
 
@@ -809,6 +822,10 @@ export default {
 
             .el-form-item {
               text-align: center;
+              
+            }
+            .el-form-item[prop="user_gender"] .el-select {
+            width: 100%; /* 为特定表单项设置宽度 */
             }
           }
 
