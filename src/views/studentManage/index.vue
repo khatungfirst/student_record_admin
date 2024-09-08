@@ -112,7 +112,7 @@
         </div>
       </div>
     </div>
-    <div id="middle" :style="{ display: display }" >
+    <div id="middle" :style="{ display: display }">
       <el-card class="box-card">
         <div slot="header" class="clearfix">
           <span>添加学生</span>
@@ -163,6 +163,7 @@
               multiple
               :on-success="uploadSuccess"
               v-permission="'user:student:addMultiplestudent'"
+              :headers="headerObj"
             >
               <i class="el-icon-upload"></i>
               <div class="el-upload__text">
@@ -415,6 +416,7 @@ import { Message } from "element-ui"; // MessageBox
 import { exportData } from "../../api/manageStudents";
 import { studentInfo } from "../../api/manageStudents";
 import { pageData } from "../../api/manageStudents";
+import { getToken } from '@/utils/auth'
 export default {
   name: "studentmanage",
   data() {
@@ -500,6 +502,9 @@ export default {
       pageLength: 0,
       //控制批量添加示例卡片的展示与否
       cardDisplay: false,
+      headerObj: {
+        'token': getToken() ||  sessionStorage.getItem("token"),
+      },
     };
   },
   async mounted() {
@@ -511,9 +516,7 @@ export default {
     async init() {
       this.role = JSON.parse(localStorage.getItem("userInfo")).role;
       this.initInfo.page = JSON.parse(localStorage.getItem("page"));
-      console.log(this.initInfo, "page");
       const data = await studentInfo(this.initInfo, this.role);
-      console.log(data, "请求");
       if (data.data !== null) {
         this.tableData = data.data.stuInfo;
         this.yearOptions = data.data.year;
@@ -527,7 +530,7 @@ export default {
 
     //将这个选中的行数据数组赋值给 multipleSelection 变量
     handleSelectionChange(val) {
-      this.selectedArr = val
+      this.selectedArr = val;
       // const existingItem = this.selectedArr.find(
       //   (item) => item.username === val[val.length-1].username
       // );
@@ -594,14 +597,16 @@ export default {
     },
 
     //批量上传学生信息的相关方法
-    uploadSuccess() {
+    uploadSuccess(response, file, fileList) {
       Message({
         icon: "el-icon-check",
-        message: "上传成功",
+        message: response.msg,
         duration: 1000,
       });
       this.init();
     },
+
+    handleSuccess(){},
 
     //关闭添加学生的窗口
     close() {
@@ -687,15 +692,15 @@ export default {
     },
 
     //示例窗口的出现
-    exampleOpen(){
-      this.cardDisplay = true
-      document.getElementById('exampleId').style = "pointer-events: auto;"
+    exampleOpen() {
+      this.cardDisplay = true;
+      document.getElementById("exampleId").style = "pointer-events: auto;";
     },
 
     //示例窗口的消失
-    exampleClose(){
-      this.cardDisplay = false
-    }
+    exampleClose() {
+      this.cardDisplay = false;
+    },
   },
 };
 </script>

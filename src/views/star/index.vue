@@ -98,7 +98,7 @@
             @click="electUsers"
             :disabled="buttonDisabled"
             v-permission="'star:user:select'"
-            >推选<i class="el-icon-s-promotion"></i
+            >推选第{{ headline }}届成长之星<i class="el-icon-s-promotion"></i
           ></el-button>
           <el-button type="primary" @click="publicStar" v-permission="'star:user:public'" :disabled = publicButton>发布</el-button>
         </div>
@@ -184,7 +184,8 @@ export default {
       total: 0, //表格中总共有多少数据
       // selectionsTotal: 0, //表示已推选的人员总数
       buttonDisabled: false, //表示两个按钮是否被禁用
-      publicButton:true  //公布按钮是否展示
+      publicButton:true,  //公布按钮是否展示
+      headline:0       //表示现在要推的是第几届的
     };
   },
   async created() {
@@ -195,9 +196,7 @@ export default {
   methods: {
     //初始化界面的数据
     async initStar() {
-      console.log('------------------------------');
-      
-      this.page = JSON.parse(localStorage.getItem("starPage"));
+      this.page =this.publicButton? JSON.parse(localStorage.getItem("starPage")):1;
       const data = await initStar(this.limit, this.page, this.search);
       if (data.data !== null) {
         this.tableData = data.data.tableData;
@@ -206,6 +205,7 @@ export default {
         this.maxSelectedCount = data.data.peopleLimit;      
         this.buttonDisabled = data.data.isDisabled
         this.search = "";
+        this.headline = data.data.headline;
         //显示已选中用户的选中状态
         this.table.map((item, index) => {
           const existingItem = this.mul.find(
@@ -335,8 +335,9 @@ export default {
       }
       this.mul = [];
       this.isAll = false
-      this.initStar();
       this.publicButton = false
+      this.initStar();
+
     },
 
     //公布成长之星名单
