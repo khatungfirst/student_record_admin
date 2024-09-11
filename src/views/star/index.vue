@@ -229,7 +229,7 @@ export default {
       const data = await initStar(this.limit, this.page, this.search);
       if (data.data !== null) {
         this.tableData = data.data.tableData;
-        this.table = this.tableData;
+        this.table = this.tableData === null?[]:this.tableData;
         this.total = data.data.total;
         this.maxSelectedCount = data.data.peopleLimit;
         this.buttonDisabled = data.data.isDisabled;
