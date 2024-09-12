@@ -110,7 +110,7 @@
         ></div>
       </div>
       <div class="overView">
-        <p class="hot">实施概况</p>
+        <p class="hot">实时概况</p>
         <el-row class="first">
           <el-col :span="12">
             <div class="img" style="background-color: #fd7c26">
