@@ -39,6 +39,7 @@
             <th width="140">粉丝数</th>
             <th width="140">积分</th>
             <th width="140">热度</th>
+            <th width="140">文章质量</th>
             <th width="140">被推选次数</th>
           </tr>
         </thead>
@@ -79,6 +80,9 @@
             </td>
             <td class="tc">
               <p>{{ i.hot }}</p>
+            </td>
+            <td class="tc">
+              <p>{{ i.quality }}</p>
             </td>
             <td class="tc">
               <p>{{ i.frequency }}</p>
