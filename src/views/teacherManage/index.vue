@@ -157,6 +157,7 @@
             <span v-else-if="scope.row.manager_type === '大二管理员'">大二管理员</span>
             <span v-else-if="scope.row.manager_type === '大三管理员'">大三管理员</span>
             <span v-else-if="scope.row.manager_type === '大四管理员'">大四管理员</span>
+            <span v-else-if="scope.row.manager_type === '院级管理员'">院级管理员</span>
             <!-- 如果需要一个默认的显示，可以添加以下行 -->
             <span v-else>无</span>
           </template>

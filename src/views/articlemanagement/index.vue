@@ -21,6 +21,7 @@
         <el-form-item>
           <el-button type="primary" @click="handleSearch">搜索</el-button>
           <el-button @click="handleReset">重置</el-button>
+          <el-button @click="handleShowAll">切换全部数据</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -40,8 +41,17 @@
         </template>
       </el-table-column>
       <el-table-column prop="upvote_amount" label="点赞数" sortable="true" order="asc"></el-table-column>
-      <el-table-column prop="comment_amount" label="收藏数" sortable="true"></el-table-column>
+      <el-table-column prop="collect_amount" label="收藏数" sortable="true"></el-table-column>
       <el-table-column prop="name" label=" 发布人"></el-table-column>
+      <el-table-column prop="article_quality" label="优秀帖子">
+        <template v-slot="{ row }">
+          <span v-if="row.article_quality === 0">普通帖子</span>
+          <span v-if="row.article_quality === 1">班级优秀帖子</span>
+          <span v-if="row.article_quality === 2">年级优秀帖子</span>
+          <span v-if="row.article_quality === 3">院级优秀帖子</span>
+          <span></span>
+        </template>
+      </el-table-column>
       <el-table-column prop="created_at" label="发布时间" sortable="true">
         <template slot-scope="scope">
           <span>{{ formatDateTime(scope.row.created_at) }}</span>
@@ -52,23 +62,38 @@
           <el-button type="text" @click="handleBan(scope.row)">封禁</el-button>
           <el-button type="text" @click="handleDel(scope.row)" class="delete-button">删除</el-button>
           <el-button type="text" @click="showArticleDetail(scope.row)" class="detail-button">查看详情</el-button>
+          <el-button type="text" @click="handleSelectExcellent(scope.row)" class="excellent-button">评为优秀帖子</el-button>
         </template>
       </el-table-column>
     </el-table>
-    <!-- 弹窗组件 -->
-    <el-dialog v-model="dialogVisible" title="帖子详情" :visible.sync="dialogVisible" :modal-append-to-body="false"
-      :append-to-body="true">
+    <!-- 弹窗组件：帖子详情 -->
+    <el-dialog v-model="dialogDetailVisible" title="帖子详情" :visible.sync="dialogDetailVisible"
+      :modal-append-to-body="false" :append-to-body="true">
       <div v-if="articleDetail">
         <p>
-          <!-- 使用 v-for 指令遍历 article_tags 数组 -->
           <span v-for="(tag, index) in articleDetail.article_tags" :key="index" class="tag-style">
             {{ tag }}
-            <!-- 如果不是最后一个元素，添加一个逗号 -->
             <span v-if="index < articleDetail.article_tags.length - 1">, </span>
           </span>
         </p>
         <p>帖子内容: {{ articleDetail.article_content.article_text }}</p>
-        <!-- 这里可以添加更多的帖子详情展示 -->
+      </div>
+    </el-dialog>
+    <!-- 弹窗组件：评为优秀帖子类型选择 -->
+    <el-dialog v-model="dialogExcellentVisible" title="选择优秀帖子类型" :visible.sync="dialogExcellentVisible" :modal="false">
+      <el-form>
+        <el-form-item>
+          <el-select v-model="article_quality" placeholder="请选择">
+            <el-option v-if="adminLevel === '院级管理员'" label="院级优秀帖子" :value="3"></el-option>
+            <el-option v-if="adminLevel === '院级管理员' || adminLevel === '年级管理员'" label="年级优秀帖子" :value="2"></el-option>
+            <el-option v-if="adminLevel === '院级管理员' || adminLevel === '年级管理员' || adminLevel === '班级管理员'" label="班级优秀帖子"
+              :value="1"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogExcellentVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleSubmit">确定</el-button>
       </div>
     </el-dialog>
     <div class="pagination">
@@ -80,7 +105,7 @@
 </template>
 
 <script>
-import { getArticleList, getArticleDetail, deleteArticle, articleBan } from "../../api/article"
+import { getArticleList, getArticleDetail, deleteArticle, articleBan, ExcellentPost,getGoodArticle } from "../../api/article"
 export default {
   name: "articlemanagement",
   data() {
@@ -94,13 +119,17 @@ export default {
       pageSize: 10, // 每页显示条数
       totalPosts: 0,
       postList: [],
-      dialogVisible: false, // 控制弹窗的显示
+      dialogDetailVisible: false, // 控制帖子详情弹窗的显示
+      dialogExcellentVisible: false, // 控制评为优秀帖子弹窗的显示
       articleDetail: null, // 用于存储帖子详情
       sort: 'created_at', // 默认排序属性
       order: 'desc', // 默认排序顺序
       topic:'',
       key_words: "",
       currentSortColumn: 'upvote_amount', // 默认排序列
+      article_quality: 0,
+      adminLevel: '年级管理员', // 假设从登录信息获取管理员级别
+      showAll: false, // 添加一个用于控制显示全部数据的布尔值
     };
   },
   computed: {
@@ -136,11 +165,14 @@ export default {
     },
     async fetchPosts(postData) {
       try {
-        const response = await getArticleList(postData);
+        // 根据某个条件决定调用哪个 API
+        console.log(postData,'12334333');
+        
+        const response = await (postData.showAll ? getArticleList(postData) : getGoodArticle(postData));
         console.log("我是帖子列表L:", response);
         if (response && response.code === 200) {
           this.updatePostList(response.data);
-          this.totalPosts = response.data.article_amount; // 后端返回的响应中包含总数据条数
+          this.totalPosts = response.data.article_amount;
         } else {
           throw new Error('API request failed with code: ' + response.code);
         }
@@ -149,6 +181,31 @@ export default {
         this.$message.error('获取帖子列表失败');
         this.postList = [];
         this.totalPosts = 0;
+      }
+    },
+    handleShowAll() {
+      // 切换 showAll 的布尔值
+      this.showAll = !this.showAll;
+
+      // 根据 showAll 的当前值调用相应的方法获取数据
+      if (this.showAll) {
+        // 如果 showAll 为 true，调用 getArticleList 获取所有帖子数据
+        this.fetchPosts({
+          page: this.currentPage,
+          limit: this.pageSize,
+          sort: this.sort,
+          order: this.order,
+          showAll: this.showAll
+        });
+      } else {
+        // 如果 showAll 为 false，调用 getGoodArticle 获取优秀帖子数据
+        this.fetchPosts({
+          page: this.currentPage,
+          limit: this.pageSize,
+          sort: this.sort,
+          order: this.order,
+          showAll: this.showAll
+        });
       }
     },
     updatePostList(data) {
@@ -172,8 +229,10 @@ export default {
         if (response && response.code === 200) {
           // 保存帖子详情到组件的数据属性
           this.articleDetail = response.data;
+          console.log(this.articleDetail,"articleDetail");
           // 显示弹窗
-          this.dialogVisible = true;
+          this.dialogDetailVisible = true;
+          console.log(this.dialogDetailVisible);
         } else {
           throw new Error('API request failed with code: ' + response.code);
         }
@@ -181,8 +240,35 @@ export default {
         console.error('Error fetching article detail:', error);
         this.$message.error('获取帖子详情失败');
         // 隐藏弹窗以防错误数据展示
-        this.dialogVisible = false;
+        this.dialogDetailVisible = false;
       }
+    },
+    handleSelectExcellent(row) {
+      this.article_id = row.article_id;
+      this.dialogExcellentVisible = true;
+    },
+    handleSubmit() {
+      this.dialogExcellentVisible = false;
+      const data = {
+        article_id : this.article_id,
+        article_quality:  Number(this.article_quality) // 转换为数字
+      };
+      ExcellentPost(data).then(response => {
+        if(response.code === 200) {
+          this.$message.success('评为优秀帖子成功');
+          this.fetchPosts({
+            page: this.currentPage,
+            limit: this.pageSize,
+            sort: this.sort,
+            order: this.order
+          });
+        } else {
+          this.$message.error('操作失败');
+        }
+      }).catch(error => {
+        console.log('Error:', error);
+        this.$message.error('操作失败')
+      });
     },
     getPostsFromAPI() {
       // 这里应该是调用API获取帖子数据的逻辑
@@ -208,6 +294,7 @@ export default {
         key_words: '',               // 假设没有提供关键词筛选，留空
         name: this.searchForm.name,   // 发布人名称
         article_ban: this.searchForm.article_ban === '' ? undefined : this.searchForm.article_ban, // 如果是空字符串，则不发送该字段
+        showAll: this.showAll
       };
       // 使用 fetchPosts 方法发送请求，并传递 postData 对象
       this.fetchPosts(postData);
@@ -221,13 +308,14 @@ export default {
       };
       this.sort = 'created_at'; // 重置默认排序属性
       this.order = 'desc'; // 重置默认排序顺序
-
+      this.showAll = false; // 重置 showAll 为 false
       // 重置搜索，发送默认参数
       this.fetchPosts({
         page: this.currentPage,
         limit: this.pageSize,
         sort: this.sort,
         order: this.order,
+        showAll: this.showAll,
         article_ban: this.searchForm.article_ban, // 传递正确的 article_ban 值
         // 其他字段使用默认值或空字符串
       });
@@ -304,7 +392,7 @@ export default {
         case "upvote_amount":
           sortField = "like_amount";
           break;
-        case "comment_amount":
+        case "collect_amount":
           sortField = "collect_amount";
           break;
         case "created_at":
