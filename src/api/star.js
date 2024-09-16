@@ -38,4 +38,9 @@ export const optional = () => {
     return request.post('/star/change_disabled')
 }
 
+//6、获取已推选人员名单
+export const electedStar = () => {
+    return request.get('/star/is_elected')
+}
+
 

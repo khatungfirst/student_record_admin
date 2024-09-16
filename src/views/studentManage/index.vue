@@ -71,6 +71,23 @@
             </el-option>
           </el-select>
         </div>
+        <div class="isDisable">
+          <span>是否是管理员：</span>
+          <el-select
+            v-model="initInfo.isManager"
+            clearable
+            placeholder="请选择"
+            @change="init"
+          >
+            <el-option
+              v-for="item in isManager"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            >
+            </el-option>
+          </el-select>
+        </div>
       </div>
       <div class="second">
         <div class="middle">
@@ -444,6 +461,16 @@ export default {
           label: "已禁用",
         },
       ],
+      isManager:[
+      {
+          value: false,
+          label: "否",
+        },
+        {
+          value: true,
+          label: "是",
+        },
+      ],
       //存放搜索类别的数组
       typeOptions: [
         {
@@ -482,6 +509,7 @@ export default {
         searchSelect: "", //选中的搜索类别
         page: 1, //当前页数
         limit: 10, //规定每页有多少条数据
+        isManager:null
       },
       //添加学生的数据
       ruleForm: {
@@ -515,7 +543,8 @@ export default {
     //初始化
     async init() {
       this.role = JSON.parse(localStorage.getItem("userInfo")).role;
-      this.initInfo.page = JSON.parse(localStorage.getItem("page"));
+      // this.initInfo.page = JSON.parse(localStorage.getItem("page"));
+      this.initInfo.page = 1;
       const data = await studentInfo(this.initInfo, this.role);
       if (data.data !== null) {
         this.tableData = data.data.stuInfo;
@@ -552,7 +581,32 @@ export default {
       this.initInfo.page = val;
       localStorage.setItem("page", this.initInfo.page);
       // const data = await pageData(this.initInfo.page, this.limit);
-      this.init();
+      const data = await studentInfo(this.initInfo, this.role);
+      if (data.data !== null) {
+        this.tableData = data.data.stuInfo;
+        this.yearOptions = data.data.year;
+        this.classOptions = data.data.class;
+        this.total = data.data.allStudentCount;
+        this.pageLength = this.tableData.length;
+      } else {
+        this.tableData = [];
+      }
+    },
+
+    //筛选后的初始化
+    async selectedInit(){
+      this.role = JSON.parse(localStorage.getItem("userInfo")).role;
+      this.initInfo.page = JSON.parse(localStorage.getItem("page"));
+      const data = await studentInfo(this.initInfo, this.role);
+      if (data.data !== null) {
+        this.tableData = data.data.stuInfo;
+        this.yearOptions = data.data.year;
+        this.classOptions = data.data.class;
+        this.total = data.data.allStudentCount;
+        this.pageLength = this.tableData.length;
+      } else {
+        this.tableData = [];
+      }
     },
 
     //重置数据
@@ -586,14 +640,17 @@ export default {
 
     //单个添加学生的方法
     async addSignalStudent() {
-      this.close();
-      await singleAdd(this.ruleForm);
-      this.init();
+      const {code} = await singleAdd(this.ruleForm);
+      if(code === 200){
+        this.close();
+        this.init();
       for (let key in this.ruleForm) {
         if (this.ruleForm.hasOwnProperty(key)) {
           this.ruleForm[key] = ""; // 或者使用 '' 或 []
         }
       }
+      }
+      
     },
 
     //批量上传学生信息的相关方法
@@ -629,9 +686,12 @@ export default {
 
     //确定修改学生信息
     async makeSure() {
-      await editStudentInfo(this.editInfo);
-      this.init();
-      this.cancel();
+      const {code} = await editStudentInfo(this.editInfo);
+      if(code === 200){
+        this.selectedInit();
+        this.cancel();
+      }
+
     },
 
     //取消修改学生信息
@@ -667,7 +727,7 @@ export default {
       //   managerType = "年级管理员";
       // }
       await makeAdmin(row, command);
-      this.init();
+      this.selectedInit();
     },
 
     //批量导出用户信息
@@ -732,7 +792,7 @@ export default {
 
       div {
         display: flex;
-        flex: 1 0 200px;
+        flex: 1 0 100px;
 
         span {
           padding-top: 5px;

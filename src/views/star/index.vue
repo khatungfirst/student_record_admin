@@ -5,11 +5,26 @@
     <div class="top">
       <el-input placeholder="请搜索要推选的人的姓名" v-model="search">
       </el-input>
-      <el-button type="primary" icon="el-icon-search" @click="initStar" v-permission="'star:user:query'"
+      <el-button
+        type="primary"
+        icon="el-icon-search"
+        @click="initStar"
+        v-permission="'star:user:query'"
         >搜索</el-button
       >
     </div>
-
+    <!-- 显示本届已推选人员的卡片 -->
+    <el-card class="box-card" v-if="cardDis">
+      <div slot="header" class="clearfix">
+        <span>已推选人员：</span>
+        <el-button style="float: right; padding: 3px 0" type="text" @click="know"
+          >我知道了</el-button
+        >
+      </div>
+      <div v-for="o in publicedList" :key="o" class="text item">
+       <span> {{ o }}</span>
+      </div>
+    </el-card>
     <!-- 推选成长之星 -->
     <div class="middle">
       <table>
@@ -24,6 +39,7 @@
             <th width="140">粉丝数</th>
             <th width="140">积分</th>
             <th width="140">热度</th>
+            <th width="140">文章质量</th>
             <th width="140">被推选次数</th>
           </tr>
         </thead>
@@ -66,6 +82,9 @@
               <p>{{ i.hot }}</p>
             </td>
             <td class="tc">
+              <p>{{ i.quality }}</p>
+            </td>
+            <td class="tc">
               <p>{{ i.frequency }}</p>
             </td>
           </tr>
@@ -100,7 +119,16 @@
             v-permission="'star:user:select'"
             >推选第{{ headline }}届成长之星<i class="el-icon-s-promotion"></i
           ></el-button>
-          <el-button type="primary" @click="publicStar" v-permission="'star:user:public'" :disabled = publicButton>发布</el-button>
+          <el-button
+            type="primary"
+            @click="publicStar"
+            v-permission="'star:user:public'"
+            :disabled="publicButton"
+            >发布</el-button
+          >
+          <el-button type="primary" @click="watchStar" v-permission="'star:elected:list'"
+            >查看本届已推选人员</el-button
+          >
         </div>
       </div>
     </div>
@@ -123,7 +151,7 @@
         <div class="classPublicity">
           <p class="title"><i class="el-icon-star-on"></i>班级之星</p>
           <div v-for="(item, index1) in classData" :key="index1" class="list">
-            <p>{{ item.className }}:</p>
+            <p class="className">{{ item.className }}:</p>
             <span
               v-for="(item, index) in classData[index1].classStar"
               :key="index"
@@ -136,7 +164,7 @@
             <i class="el-icon-star-on"></i
             ><i class="el-icon-star-on"></i>年级之星
           </p>
-          <div v-for="(item, index) in gradeData" :key="index" class="list">
+          <div v-for="(item, index) in gradeData" :key="index" class="list1">
             <span>{{ item.gradeName }}-{{ item.gradeClass }}</span>
           </div>
         </div>
@@ -145,7 +173,7 @@
             <i class="el-icon-star-on"></i><i class="el-icon-star-on"></i
             ><i class="el-icon-star-on"></i>院级之星
           </p>
-          <div v-for="(item, index) in hospitalData" :key="index" class="list">
+          <div v-for="(item, index) in hospitalData" :key="index" class="list1">
             <span>{{ item.gradeName }}-{{ item.gradeClass }}</span>
           </div>
         </div>
@@ -161,8 +189,9 @@ import { optional } from "../../api/star";
 import { elected } from "../../api/star";
 import { publicStar } from "../../api/star";
 import { termStar } from "../../api/star";
+import { electedStar } from "../../api/star";
 export default {
-  name:'star',
+  name: "star",
   data() {
     return {
       search: "", //存放搜索框中的内容
@@ -184,8 +213,10 @@ export default {
       total: 0, //表格中总共有多少数据
       // selectionsTotal: 0, //表示已推选的人员总数
       buttonDisabled: false, //表示两个按钮是否被禁用
-      publicButton:true,  //公布按钮是否展示
-      headline:0       //表示现在要推的是第几届的
+      publicButton: true, //公布按钮是否展示
+      headline: 0, //表示现在要推的是第几届的
+      publicedList: [], //存放本届已推选名单
+      cardDis:false,    //控制显示本次已推选人员卡片是否显示
     };
   },
   async created() {
@@ -196,14 +227,16 @@ export default {
   methods: {
     //初始化界面的数据
     async initStar() {
-      this.page =this.publicButton? JSON.parse(localStorage.getItem("starPage")):1;
+      this.page = this.publicButton
+        ? JSON.parse(localStorage.getItem("starPage"))
+        : 1;
       const data = await initStar(this.limit, this.page, this.search);
       if (data.data !== null) {
         this.tableData = data.data.tableData;
-        this.table = this.tableData;
+        this.table = this.tableData === null?[]:this.tableData;
         this.total = data.data.total;
-        this.maxSelectedCount = data.data.peopleLimit;      
-        this.buttonDisabled = data.data.isDisabled
+        this.maxSelectedCount = data.data.peopleLimit;
+        this.buttonDisabled = data.data.isDisabled;
         this.search = "";
         this.headline = data.data.headline;
         //显示已选中用户的选中状态
@@ -320,24 +353,21 @@ export default {
         }
         const data = await elected(this.mul, role);
         if (data.msg !== "数据已存在") {
-            if (
-              data.data === 'No seats left'
-            ) {
-              console.log('禁用按钮');
-              
-              await optional();
-              this.buttonDisabled = true;
-              Message({
-                message: "推选名额已经用完喽",
-              });
-            }
+          if (data.data.news === "No seats left") {
+            console.log("禁用按钮");
+
+            await optional();
+            this.buttonDisabled = true;
+            Message({
+              message: "推选名额已经用完喽",
+            });
+          }
         }
       }
       this.mul = [];
-      this.isAll = false
-      this.publicButton = false
+      this.isAll = false;
+      this.publicButton = false;
       this.initStar();
-
     },
 
     //公布成长之星名单
@@ -345,7 +375,7 @@ export default {
       this.buttonDisabled = false;
       const data = await publicStar();
       this.initPublic(data);
-      this.initStar()
+      this.initStar();
     },
 
     //重新选择
@@ -358,6 +388,18 @@ export default {
       });
       this.mul = [];
     },
+
+    //关闭显示本次已推选人的卡片
+    know(){
+      this.cardDis = false
+    },
+
+    //显示本次已推选人的卡片
+     async watchStar(){
+      this.cardDis = !this.cardDis
+      const {data} = await electedStar();
+      this.publicedList = data.list
+    }
   },
 };
 </script>
@@ -370,6 +412,7 @@ export default {
   height: 100%;
   display: grid;
   grid-template-rows: 1fr 3fr 4fr;
+  position: relative;
 
   /* 自定义滚动条整体宽度 */
   ::-webkit-scrollbar {
@@ -398,6 +441,39 @@ export default {
     .el-input {
       width: 60%;
       margin-right: 20px;
+    }
+  }
+
+  .box-card {
+    width: 40%;
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    z-index: 999;
+    .text {
+      font-size: 14px;
+    }
+
+    .item {
+      display: inline-block;
+      margin-bottom: 18px;
+      span{
+        margin: 5px;
+      }
+    }
+
+    .clearfix:before,
+    .clearfix:after {
+      display: table;
+      content: "";
+    }
+    .clearfix:after {
+      clear: both;
+    }
+
+    .box-card {
+      width: 480px;
     }
   }
 
@@ -507,10 +583,21 @@ export default {
         margin: 10px 0px;
       }
 
-      .list {
+      .list,.list1 {
         font-family: "楷体";
         font-size: 18px;
         border: none;
+
+        .className{
+          text-align: left;
+        }
+      }
+
+      .list1{
+        display: inline-block;
+        width: 50%;
+        text-align: center;
+        margin-bottom: 15px;
       }
 
       p {
