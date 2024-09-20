@@ -43,8 +43,14 @@
                 <!-- <el-form-item label="性别" prop="user_gender" label-width="50px">
                   <el-input v-model="ruleForm.user_gender"></el-input>
                 </el-form-item> -->
-                <el-form-item label="性别" prop="user_gender" label-width="50px">
+                <!-- <el-form-item label="性别" prop="user_gender" label-width="50px">
                   <el-select v-model="ruleForm.user_gender" placeholder="请选择性别" @change="handleGenderChange">
+                    <el-option label="男" value="男"></el-option>
+                    <el-option label="女" value="女"></el-option>
+                  </el-select>
+                </el-form-item> -->
+                <el-form-item label="性别" prop="user_gender" label-width="50px">
+                  <el-select v-model="ruleForm.user_gender" placeholder="请选择性别">
                     <el-option label="男" value="男"></el-option>
                     <el-option label="女" value="女"></el-option>
                   </el-select>
@@ -245,7 +251,7 @@ export default {
         name:''
       },
       //用来存放用户选择下拉框中的值
-      user_gender: "",
+      // user_gender: "",
       search_message: "", //搜索框输入的内容
       display: "none",
       // 搜索类型，如账号或姓名
@@ -271,7 +277,7 @@ export default {
         username: "",
         password: "",
         name: "",
-        user_gender:''
+        user_gender:'男'
       },
       searchParams: {
         search_select: "",
@@ -436,6 +442,7 @@ export default {
     addTeacher() {
       document.body.style = "pointer-events: none;";
       document.getElementById("middle").style = "pointer-events: auto;";
+      this.ruleForm = { username: "", password: "", name: "", user_gender: "" }; // 重置表单
       this.display = "block";
     },
 
@@ -452,6 +459,7 @@ export default {
         this.$message.warning('请填写完整信息');
         return;
       }
+      console.log('Adding teacher with:', this.ruleForm); // 检查提交的数据
       this.addSingleTeacherFun();
     },
 
@@ -459,7 +467,7 @@ export default {
       addSingleTeacher(this.ruleForm).then(response => {
         if (response.code === 200) {
           this.$message.success('添加老师成功');
-          this.ruleForm = { username: '', password: '', name: '' }; // 重置表单
+          this.ruleForm = { username: '', password: '', name: '', user_gender:''}; // 重置表单
           this.display = 'none'; // 关闭表单
           this.getTeacherList(this.searchParams); // 重新获取老师列表
         } else {
@@ -690,6 +698,8 @@ export default {
       this.cardDisplay = false;
     },
     handleGenderChange(value) {
+      // 更新 ruleForm.user_gender 的值
+      this.ruleForm.user_gender = value;
       console.log('Selected gender:', value);
     },
   },
@@ -810,7 +820,7 @@ export default {
         justify-content: space-around;
 
         .text-left {
-          width: 50%;
+          width: 318px;
           height: 70%;
           border-right: 1px solid rgb(130, 127, 127);
           padding-right: 5%;
@@ -823,6 +833,7 @@ export default {
             align-items: center;
             justify-content: center;
 
+            
             .el-form-item {
               text-align: center;
               

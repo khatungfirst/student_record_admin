@@ -21,7 +21,7 @@
         <el-form-item>
           <el-button type="primary" @click="handleSearch">搜索</el-button>
           <el-button @click="handleReset">重置</el-button>
-          <el-button @click="handleShowAll">切换全部数据</el-button>
+          <el-button @click="handleShowAll">{{ showAllText }}</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -76,7 +76,7 @@
             <span v-if="index < articleDetail.article_tags.length - 1">, </span>
           </span>
         </p>
-        <p>帖子内容: {{ articleDetail.article_content.article_text }}</p>
+        <p>帖子内容: {{ processedContent }}</p>
       </div>
     </el-dialog>
     <!-- 弹窗组件：评为优秀帖子类型选择 -->
@@ -84,10 +84,13 @@
       <el-form>
         <el-form-item>
           <el-select v-model="article_quality" placeholder="请选择">
-            <el-option v-if="role === 'college'" label="院级优秀帖子" :value="3"></el-option>
-            <el-option v-if="role === 'college' || role === 'grade1' || role === 'grade2' || role === 'grade3' || role === 'grade4'" label="年级优秀帖子" :value="2"></el-option>
-            <el-option v-if="role === 'college' || role === 'grade1' || role === 'grade2' || role === 'grade3' || role === 'grade4' || role === 'class'" label="班级优秀帖子"
-              :value="1"></el-option>
+            <el-option v-if="role === 'college' || role === 'superman'" label="院级优秀帖子" :value="3"></el-option>
+            <el-option
+              v-if="role === 'superman' || role === 'college' || role === 'grade1' || role === 'grade2' || role === 'grade3' || role === 'grade4'"
+              label="年级优秀帖子" :value="2"></el-option>
+            <el-option
+              v-if="role === 'superman' || role === 'college' || role === 'grade1' || role === 'grade2' || role === 'grade3' || role === 'grade4' || role === 'class'"
+              label="班级优秀帖子" :value="1"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -115,7 +118,8 @@ export default {
         article_ban: false, // 是否被封禁，可以是 'true'、'false' 或 ''（未选择）
         name: ''   // 发布人
       },
-      currentPage: 1, // 当前页码
+      allPostsCurrentPage: 1, // 全部帖子的当前页码
+      goodPostsCurrentPage: 1, // 优秀帖子的当前页码
       pageSize: 10, // 每页显示条数
       totalPosts: 0,
       postList: [],
@@ -130,6 +134,7 @@ export default {
       article_quality: '请选择',
       role: 'college', 
       showAll: false, // 添加一个用于控制显示全部数据的布尔值
+      showAllText: '切换全部数据', // 按钮文字
     };
   },
   computed: {
@@ -138,11 +143,24 @@ export default {
       let startIndex = (this.currentPage - 1) * this.pageSize;
       let endIndex = startIndex + this.pageSize;
       return this.allPosts.slice(startIndex, endIndex);
+    },
+    processedContent() {
+      // 使用 DOMParser 移除 HTML 标签，只保留文本内容
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(this.articleDetail.article_content.article_text, 'text/html');
+      return doc.body.textContent || " ";
     }
   },
   created() {
     // 调用 handleSearch 而不是 fetchPosts
-    this.handleSearch();
+    this.fetchPosts({
+      page: this.currentPage,
+      limit: this.pageSize,
+      sort: this.sort,
+      order: this.order,
+      showAll: this.showAll
+    });
+    this.currentPage = this.showAll ? this.allPostsCurrentPage : this.goodPostsCurrentPage;
   },
   methods: {
     // 格式化日期时间的方法
@@ -186,6 +204,10 @@ export default {
     handleShowAll() {
       // 切换 showAll 的布尔值
       this.showAll = !this.showAll;
+      this.showAllText = this.showAll ? '切换优秀帖子' : '切换全部数据'; // 更新按钮文字
+
+      // 更新 currentPage 以匹配当前视图的页码
+      this.currentPage = this.showAll ? this.allPostsCurrentPage : this.goodPostsCurrentPage;
 
       // 根据 showAll 的当前值调用相应的方法获取数据
       if (this.showAll) {
@@ -371,12 +393,18 @@ export default {
       });
     },
     handleCurrentChange(newPage) {
+      if (this.showAll) {
+        this.allPostsCurrentPage = newPage;
+      } else {
+        this.goodPostsCurrentPage = newPage;
+      }
       this.currentPage = newPage;
       this.fetchPosts({
         page: this.currentPage,
         limit: this.pageSize,
         sort: this.sort,
         order: this.order,
+        showAll: this.showAll
         // 其他搜索参数
       });
     },
