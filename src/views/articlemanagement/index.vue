@@ -84,9 +84,9 @@
       <el-form>
         <el-form-item>
           <el-select v-model="article_quality" placeholder="请选择">
-            <el-option v-if="adminLevel === '院级管理员'" label="院级优秀帖子" :value="3"></el-option>
-            <el-option v-if="adminLevel === '院级管理员' || adminLevel === '年级管理员'" label="年级优秀帖子" :value="2"></el-option>
-            <el-option v-if="adminLevel === '院级管理员' || adminLevel === '年级管理员' || adminLevel === '班级管理员'" label="班级优秀帖子"
+            <el-option v-if="role === 'college'" label="院级优秀帖子" :value="3"></el-option>
+            <el-option v-if="role === 'college' || role === 'grade1' || role === 'grade2' || role === 'grade3' || role === 'grade4'" label="年级优秀帖子" :value="2"></el-option>
+            <el-option v-if="role === 'college' || role === 'grade1' || role === 'grade2' || role === 'grade3' || role === 'grade4' || role === 'class'" label="班级优秀帖子"
               :value="1"></el-option>
           </el-select>
         </el-form-item>
@@ -127,8 +127,8 @@ export default {
       topic:'',
       key_words: "",
       currentSortColumn: 'upvote_amount', // 默认排序列
-      article_quality: 0,
-      adminLevel: '年级管理员', // 假设从登录信息获取管理员级别
+      article_quality: '请选择',
+      role: 'college', 
       showAll: false, // 添加一个用于控制显示全部数据的布尔值
     };
   },

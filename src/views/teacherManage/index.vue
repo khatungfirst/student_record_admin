@@ -148,6 +148,8 @@
         </el-table-column>
         <el-table-column prop="username" label="手机号" show-overflow-tooltip align="center">
         </el-table-column>
+        <el-table-column prop="password" label="密码" show-overflow-tooltip align="center">
+        </el-table-column>
         <el-table-column prop="user_gender" label="性别" align="center"></el-table-column>
         <el-table-column prop="manager_type" label="管理员类型" show-overflow-tooltip align="center">
           <template slot-scope="scope">
