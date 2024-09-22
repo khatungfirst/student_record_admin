@@ -73,7 +73,6 @@
               <p>批量导入</p>
               <el-upload class="upload-demo" drag action="http://192.168.10.7:8881/teacherManage/addMultipleTeacher"
                 :on-success="handleImportSuccess" :headers="headers" multiple :on-error="handleImportError"
-                :file-list="fileList"
                 :accept="'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'">
                 <i class="el-icon-upload"></i>
                 <div class="el-upload__text">将Excel表格文件拖到此处，或<em>点击上传</em></div>
