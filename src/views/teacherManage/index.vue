@@ -49,11 +49,14 @@
                     <el-option label="女" value="女"></el-option>
                   </el-select>
                 </el-form-item> -->
-                <el-form-item label="性别" prop="user_gender" label-width="50px">
+                <!-- <el-form-item label="性别" prop="user_gender" label-width="50px">
                   <el-select v-model="ruleForm.user_gender" placeholder="请选择性别">
                     <el-option label="男" value="男"></el-option>
                     <el-option label="女" value="女"></el-option>
                   </el-select>
+                </el-form-item> -->
+                <el-form-item label="性别" prop="user_gender" label-width="50px">
+                  <el-input v-model="ruleForm.user_gender"></el-input>
                 </el-form-item>
                 <el-form-item label="账号" prop="username" label-width="50px">
                   <el-input v-model="ruleForm.username"></el-input>
@@ -68,13 +71,12 @@
             </div>
             <div class="text-right">
               <p>批量导入</p>
-              <el-upload class="upload-demo" drag
-                :accept="'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'"
-                action="/api/teacher/addMultipleTeacher" multiple>
+              <el-upload class="upload-demo" drag action="http://192.168.10.7:8881/teacherManage/addMultipleTeacher"
+                :on-success="handleImportSuccess" :headers="headers" multiple :on-error="handleImportError"
+                :file-list="fileList"
+                :accept="'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'">
                 <i class="el-icon-upload"></i>
-                <div class="el-upload__text">
-                  将Excel表格文件拖到此处，或<em>点击上传</em>
-                </div>
+                <div class="el-upload__text">将Excel表格文件拖到此处，或<em>点击上传</em></div>
                 <div class="el-upload__tip" slot="tip">
                   注：只能上传excel表格(其中包含个人的班级、姓名、学号、密码)
                   <p>
@@ -87,7 +89,7 @@
 
             <el-dialog title="按照下面的格式进行上传文件：" :visible.sync="cardDisplay" width="30%" :modal-append-to-body="false"
               :append-to-body="true" :show-close="false" id="exampleId">
-              <img src="../../../static/img/example.png" style="width: 400px; height: 400px" />
+              <img src="../../../static/img/multipleExport.png" style="width: 400px; height: 400px" />
               <!-- <span slot="footer" class="dialog-footer"> -->
               <el-button @click="exampleClose">我知道了</el-button>
             </el-dialog>
@@ -277,7 +279,7 @@ export default {
         username: "",
         password: "",
         name: "",
-        user_gender:'男'
+        user_gender:""
       },
       searchParams: {
         search_select: "",
@@ -292,6 +294,10 @@ export default {
       selectedArr: [],
       //控制批量添加示例卡片的展示与否
       cardDisplay: false,
+      headers: {
+        'Authorization': `Bearer ${this.getToken()}`, // 示例：添加认证令牌
+      },
+      fileList: [], // 用于存储上传文件的列表
     };
   },
   created() {
@@ -478,7 +484,20 @@ export default {
         this.$message.error('添加老师失败');
       });
     },
-
+    // 上传成功处理
+    handleImportSuccess(response, file, fileList) {
+      // 处理上传成功逻辑
+      if (response.code === 200) {
+        this.$message.success('批量导入成功');
+        this.getTeacherList(this.searchParams); // 重新获取老师列表
+      } else {
+        this.$message.error(response.msg || '批量导入失败');
+      }
+    },
+    // 上传失败处理
+    handleImportError(err, file, fileList) {
+      this.$message.error('文件上传失败');
+    },
     handleRowClick(row) {
       // 保存点击的行数据
       this.clickedRow = row;
@@ -692,7 +711,10 @@ export default {
       this.cardDisplay = true;
       document.getElementById('exampleId').style.pointerEvents = 'auto';
     },
-
+    // 获取认证令牌的方法
+    getToken() {
+      return sessionStorage.getItem('token');
+    },
     // 示例窗口的消失
     exampleClose() {
       this.cardDisplay = false;
