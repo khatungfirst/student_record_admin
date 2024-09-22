@@ -300,6 +300,7 @@
           label="密码"
           show-overflow-tooltip
           align="center"
+          v-if="isPassword"
         >
         </el-table-column>
         <el-table-column
@@ -530,6 +531,8 @@ export default {
       pageLength: 0,
       //控制批量添加示例卡片的展示与否
       cardDisplay: false,
+      //密码字段是否显示
+      isPassword:true,
       headerObj: {
         'token': getToken() ||  sessionStorage.getItem("token"),
       },
@@ -542,6 +545,9 @@ export default {
   methods: {
     //初始化
     async init() {
+      if(JSON.parse(localStorage.getItem('userInfo')).role === 'class'){
+        this.isPassword = false
+      }
       this.role = JSON.parse(localStorage.getItem("userInfo")).role;
       // this.initInfo.page = JSON.parse(localStorage.getItem("page"));
       this.initInfo.page = 1;
