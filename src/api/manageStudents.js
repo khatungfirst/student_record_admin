@@ -23,7 +23,7 @@ export const singleAdd = (ruleForm) => {
 
 //3、批量导出
 export function exportData(selected_students) {
-    fetch('http://192.168.10.7:8881/stuManage/outputMultipleStudent',
+    fetch('http://shuXueProject:8881/stuManage/outputMultipleStudent',
         {
             method: 'POST',
             headers: {
