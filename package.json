@@ -6,7 +6,7 @@
     "start": "npm run dev",
     "build": "set NODE_ENV=production && node build/build.js --mode production",
     "pro": "set NODE_ENV=pro && node build/build.js --mode pro",
-    "build:report": "npm_config_report=true NODE_ENV=production env_config=prod node build/build.js",
+    "build:report": "npm_config_report=true NODE_ENV=pro env_config=prod node build/build.js",
     "lint": "eslint --ext .js,.vue src",
     "test": "npm run lint"
   },
