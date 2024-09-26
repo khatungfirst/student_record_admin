@@ -22,7 +22,7 @@ service.interceptors.request.use(config => {
   //   duration: 0
   // })
 
-  
+  console.log(process.env.NODE_ENV)
   if (sessionStorage.getItem('token')) {
     config.headers['token'] = getToken() || sessionStorage.getItem('token')
   }
