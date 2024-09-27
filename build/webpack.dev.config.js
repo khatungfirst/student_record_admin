@@ -4,7 +4,7 @@ const utils = require('./utils')
 const webpack = require('webpack')
 const config = require('../configs')
 const merge = require('webpack-merge')
-const baseWebpackConfig = require('./webpack.base.conf')
+const baseWebpackConfig = require('./webpack.base.confg')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
@@ -13,12 +13,14 @@ function resolve(dir) {
   return path.join(__dirname, '..', dir)
 }
 
-const env = require('../configs/' + process.env.env_config1 + '.env')
 const HOST = process.env.HOST
 const PORT = process.env.PORT && Number(process.env.PORT)
 
 const devWebpackConfig = merge(baseWebpackConfig, {
   mode: 'development',
+  entry: {
+    app: path.resolve(__dirname, 'src', 'main.js') // 使用绝对路径
+},
   module: {
     rules: utils.styleLoaders({
       sourceMap: config.dev.cssSourceMap,
@@ -49,7 +51,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env': env
+      'process.env': require('../configs/dev.env')
     }),
     new webpack.HotModuleReplacementPlugin(),
     // https://github.com/ampedandwired/html-webpack-plugin
@@ -98,4 +100,3 @@ module.exports = new Promise((resolve, reject) => {
     }
   })
 })
-module.exports = devWebpackConfig

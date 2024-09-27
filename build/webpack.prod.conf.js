@@ -11,13 +11,16 @@ const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
-// 引入dotenv模块
+// 引入dotenv模块,用于加载环境变量配置
 require('dotenv').config();
 
+
+//用于生成绝对路径，避免路径书写错误
 function resolve(dir) {
   return path.join(__dirname, '..', dir)
 }
 
+//根据环境变量动态加载相应的配置文件
 const env = require('../configs/' + process.env.env_config + '.env')
 
 // For NamedChunksPlugin
@@ -36,7 +39,7 @@ const webpackConfig = merge(baseWebpackConfig, {
   devtool: config.build.productionSourceMap ? config.build.devtool : false,
   output: {
     path: config.build.assetsRoot,
-    filename: utils.assetsPath("js/[name].[chunkhash:8].js"),
+    filename: utils.assetsPath("js/[name].[chunkhash:8].js"),  
     chunkFilename: utils.assetsPath("js/[name].[chunkhash:8].js")
   },
   plugins: [
@@ -52,6 +55,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     // generate dist index.html with correct asset hash for caching.
     // you can customize output by editing /index.html
     // see https://github.com/ampedandwired/html-webpack-plugin
+    //生成 HTML 文件并自动引入构建的资源
     new HtmlWebpackPlugin({
       filename: config.build.index,
       chunksSortMode: "none",
