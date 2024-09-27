@@ -9,7 +9,7 @@ import {baseURL} from '../../configs/index'
 const service = axios.create({
   // baseURL: 'http://127.0.0.1:4523/m1/4869431-0-default',
   // baseURL: baseURL,
-   baseURL: process.env.NODE_ENV === 'production' ? 'http://192.168.10.7:8881' : process.env.NODE_ENV === 'pro' ? "http://8.154.36.180:8903":'/api',
+   baseURL: process.env.NODE_ENV === 'production' ? 'http://192.168.10.7:8881' : process.env.NODE_ENV === 'development' ? "http://8.154.36.180:8903":'/api',
   timeout: 15000
 })
 
