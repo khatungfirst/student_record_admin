@@ -43,3 +43,20 @@ export function articleBan(article_id, article_ban) {
   });
 }
 
+// 选为优秀帖子
+export function ExcellentPost(data) {
+  return request({
+    url: "/article/select_good_article",
+    method: "post",
+    data
+});
+}
+
+// 获取优秀帖子
+export function getGoodArticle(data) {
+  return request({
+    url: "/article/getGoodArticles",
+    method: "post",
+    data
+  });
+}

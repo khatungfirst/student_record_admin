@@ -37,14 +37,32 @@
             <div class="text-left">
               <p>单个添加</p>
               <el-form :model="ruleForm" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+                <el-form-item label="姓名" prop="name" label-width="50px">
+                  <el-input v-model="ruleForm.name"></el-input>
+                </el-form-item>
+                <!-- <el-form-item label="性别" prop="user_gender" label-width="50px">
+                  <el-input v-model="ruleForm.user_gender"></el-input>
+                </el-form-item> -->
+                <!-- <el-form-item label="性别" prop="user_gender" label-width="50px">
+                  <el-select v-model="ruleForm.user_gender" placeholder="请选择性别" @change="handleGenderChange">
+                    <el-option label="男" value="男"></el-option>
+                    <el-option label="女" value="女"></el-option>
+                  </el-select>
+                </el-form-item> -->
+                <!-- <el-form-item label="性别" prop="user_gender" label-width="50px">
+                  <el-select v-model="ruleForm.user_gender" placeholder="请选择性别">
+                    <el-option label="男" value="男"></el-option>
+                    <el-option label="女" value="女"></el-option>
+                  </el-select>
+                </el-form-item> -->
+                <el-form-item label="性别" prop="user_gender" label-width="50px">
+                  <el-input v-model="ruleForm.user_gender"></el-input>
+                </el-form-item>
                 <el-form-item label="账号" prop="username" label-width="50px">
                   <el-input v-model="ruleForm.username"></el-input>
                 </el-form-item>
                 <el-form-item label="密码" prop="password" label-width="50px">
                   <el-input v-model="ruleForm.password"></el-input>
-                </el-form-item>
-                <el-form-item label="姓名" prop="name" label-width="50px">
-                  <el-input v-model="ruleForm.name"></el-input>
                 </el-form-item>
               </el-form>
               <div class="signal-button">
@@ -53,13 +71,11 @@
             </div>
             <div class="text-right">
               <p>批量导入</p>
-              <el-upload class="upload-demo" drag
-                :accept="'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'"
-                action="/api/teacher/addMultipleTeacher" multiple>
+              <el-upload class="upload-demo" drag action="http://192.168.10.7:8881/teacherManage/addMultipleTeacher"
+                :on-success="handleImportSuccess" :headers="headers" multiple :on-error="handleImportError"
+                :accept="'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'">
                 <i class="el-icon-upload"></i>
-                <div class="el-upload__text">
-                  将Excel表格文件拖到此处，或<em>点击上传</em>
-                </div>
+                <div class="el-upload__text">将Excel表格文件拖到此处，或<em>点击上传</em></div>
                 <div class="el-upload__tip" slot="tip">
                   注：只能上传excel表格(其中包含个人的班级、姓名、学号、密码)
                   <p>
@@ -72,7 +88,7 @@
 
             <el-dialog title="按照下面的格式进行上传文件：" :visible.sync="cardDisplay" width="30%" :modal-append-to-body="false"
               :append-to-body="true" :show-close="false" id="exampleId">
-              <img src="../../../static/img/example.png" style="width: 400px; height: 400px" />
+              <img src="../../../static/img/multipleExport.png" style="width: 400px; height: 400px" />
               <!-- <span slot="footer" class="dialog-footer"> -->
               <el-button @click="exampleClose">我知道了</el-button>
             </el-dialog>
@@ -118,10 +134,10 @@
           <el-dropdown trigger="click" @command="handleSetManager">
             <span class="el-dropdown-link"> 设为管理员 </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="grade1">大一管理员</el-dropdown-item>
-              <el-dropdown-item command="grade2">大二管理员</el-dropdown-item>
-              <el-dropdown-item command="grade3">大三管理员</el-dropdown-item>
-              <el-dropdown-item command="grade4">大四管理员</el-dropdown-item>
+              <el-dropdown-item command="大一管理员">大一管理员</el-dropdown-item>
+              <el-dropdown-item command="大二管理员">大二管理员</el-dropdown-item>
+              <el-dropdown-item command="大三管理员">大三管理员</el-dropdown-item>
+              <el-dropdown-item command="大四管理员">大四管理员</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
 
@@ -139,15 +155,18 @@
         </el-table-column>
         <el-table-column prop="username" label="手机号" show-overflow-tooltip align="center">
         </el-table-column>
+        <el-table-column prop="password" label="密码" show-overflow-tooltip align="center">
+        </el-table-column>
         <el-table-column prop="user_gender" label="性别" align="center"></el-table-column>
         <el-table-column prop="manager_type" label="管理员类型" show-overflow-tooltip align="center">
           <template slot-scope="scope">
             <!-- 根据 scope.row.manager_type 的值来显示文本 -->
             <!-- 使用 v-else-if 和 v-else 链式结构 -->
-            <span v-if="scope.row.manager_type === '大一管理员'">大一管理员</span>
+            <span v-if="scope.row.manager_type === '年级管理员'">大一管理员</span>
             <span v-else-if="scope.row.manager_type === '大二管理员'">大二管理员</span>
             <span v-else-if="scope.row.manager_type === '大三管理员'">大三管理员</span>
             <span v-else-if="scope.row.manager_type === '大四管理员'">大四管理员</span>
+            <span v-else-if="scope.row.manager_type === '院级管理员'">院级管理员</span>
             <!-- 如果需要一个默认的显示，可以添加以下行 -->
             <span v-else>无</span>
           </template>
@@ -233,7 +252,7 @@ export default {
         name:''
       },
       //用来存放用户选择下拉框中的值
-      user_gender: "",
+      // user_gender: "",
       search_message: "", //搜索框输入的内容
       display: "none",
       // 搜索类型，如账号或姓名
@@ -259,6 +278,7 @@ export default {
         username: "",
         password: "",
         name: "",
+        user_gender:""
       },
       searchParams: {
         search_select: "",
@@ -273,6 +293,10 @@ export default {
       selectedArr: [],
       //控制批量添加示例卡片的展示与否
       cardDisplay: false,
+      headers: {
+        'Authorization': `Bearer ${this.getToken()}`, // 示例：添加认证令牌
+      },
+      fileList: [], // 用于存储上传文件的列表
     };
   },
   created() {
@@ -423,11 +447,14 @@ export default {
     addTeacher() {
       document.body.style = "pointer-events: none;";
       document.getElementById("middle").style = "pointer-events: auto;";
+      this.ruleForm = { username: "", password: "", name: "", user_gender: "" }; // 重置表单
       this.display = "block";
     },
 
     //关闭添加老师的窗口
     close() {
+      console.log('关闭');
+      
       this.display = "none";
       document.body.style = "pointer-events: auto;";
     },
@@ -437,6 +464,7 @@ export default {
         this.$message.warning('请填写完整信息');
         return;
       }
+      console.log('Adding teacher with:', this.ruleForm); // 检查提交的数据
       this.addSingleTeacherFun();
     },
 
@@ -444,7 +472,7 @@ export default {
       addSingleTeacher(this.ruleForm).then(response => {
         if (response.code === 200) {
           this.$message.success('添加老师成功');
-          this.ruleForm = { username: '', password: '', name: '' }; // 重置表单
+          this.ruleForm = { username: '', password: '', name: '', user_gender:''}; // 重置表单
           this.display = 'none'; // 关闭表单
           this.getTeacherList(this.searchParams); // 重新获取老师列表
         } else {
@@ -455,7 +483,20 @@ export default {
         this.$message.error('添加老师失败');
       });
     },
-
+    // 上传成功处理
+    handleImportSuccess(response, file, fileList) {
+      // 处理上传成功逻辑
+      if (response.code === 200) {
+        this.$message.success('批量导入成功');
+        this.getTeacherList(this.searchParams); // 重新获取老师列表
+      } else {
+        this.$message.error(response.msg || '批量导入失败');
+      }
+    },
+    // 上传失败处理
+    handleImportError(err, file, fileList) {
+      this.$message.error('文件上传失败');
+    },
     handleRowClick(row) {
       // 保存点击的行数据
       this.clickedRow = row;
@@ -669,10 +710,18 @@ export default {
       this.cardDisplay = true;
       document.getElementById('exampleId').style.pointerEvents = 'auto';
     },
-
+    // 获取认证令牌的方法
+    getToken() {
+      return sessionStorage.getItem('token');
+    },
     // 示例窗口的消失
     exampleClose() {
       this.cardDisplay = false;
+    },
+    handleGenderChange(value) {
+      // 更新 ruleForm.user_gender 的值
+      this.ruleForm.user_gender = value;
+      console.log('Selected gender:', value);
     },
   },
 };
@@ -792,8 +841,8 @@ export default {
         justify-content: space-around;
 
         .text-left {
-          width: 50%;
-          height: 60%;
+          width: 318px;
+          height: 70%;
           border-right: 1px solid rgb(130, 127, 127);
           padding-right: 5%;
 
@@ -805,8 +854,13 @@ export default {
             align-items: center;
             justify-content: center;
 
+            
             .el-form-item {
               text-align: center;
+              
+            }
+            .el-form-item[prop="user_gender"] .el-select {
+            width: 100%; /* 为特定表单项设置宽度 */
             }
           }
 
@@ -825,13 +879,12 @@ export default {
 
         .text-right {
           width: 50%;
-          position: relative;
-          top: -88px;
+          height: 60%;
           display: flex;
           align-items: center;
           justify-content: center;
           flex-direction: column;
-          padding-left: 20px;
+          // padding-left: 20px;
           overflow: hidden;
 
           .el-upload {
@@ -842,7 +895,7 @@ export default {
 
           .el-upload__tip {
             width: 80%;
-            margin: 20px auto;
+            margin: 10px auto;
           }
         }
 
