@@ -17,6 +17,7 @@ spinner.start()
 
 rm(path.join(config.build.assetsRoot, config.build.assetsSubDirectory), err => {
   if (err) throw err
+  console.log("#####################",process.env.NODE_ENV === 'production' )
   if(process.env.NODE_ENV === 'production'){
     webpack(webpackConfig, (err, stats) => {
       spinner.stop()

@@ -47,7 +47,7 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: 'https://yangyuji.github.io/vue-element-admin/',
+    // assetsPublicPath: process.env.NODE_ENV === 'production' ? 'http://8.154.36.180:8903' : 'http://192.168.10.7:8881',
 
     /**
      * Source Maps

@@ -1,0 +1,72 @@
+{
+  "id": "4633104",
+  "name": "Math项目",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "825092",
+      "name": "访客",
+      "font_class": "fangke",
+      "unicode": "e620",
+      "unicode_decimal": 58912
+    },
+    {
+      "icon_id": "2959121",
+      "name": "字典管理",
+      "font_class": "zidianguanli",
+      "unicode": "e63b",
+      "unicode_decimal": 58939
+    },
+    {
+      "icon_id": "3865276",
+      "name": "书本",
+      "font_class": "shuben",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "6080606",
+      "name": "分类_",
+      "font_class": "fenlei_",
+      "unicode": "e621",
+      "unicode_decimal": 58913
+    },
+    {
+      "icon_id": "9243581",
+      "name": "帖子",
+      "font_class": "tiezi",
+      "unicode": "e645",
+      "unicode_decimal": 58949
+    },
+    {
+      "icon_id": "10828184",
+      "name": "浓度",
+      "font_class": "jiujingnongdu",
+      "unicode": "e70d",
+      "unicode_decimal": 59149
+    },
+    {
+      "icon_id": "13106260",
+      "name": "安全",
+      "font_class": "anquan",
+      "unicode": "e609",
+      "unicode_decimal": 58889
+    },
+    {
+      "icon_id": "15077429",
+      "name": "首页",
+      "font_class": "shouye",
+      "unicode": "e638",
+      "unicode_decimal": 58936
+    },
+    {
+      "icon_id": "37293559",
+      "name": "分类",
+      "font_class": "fenlei",
+      "unicode": "e61b",
+      "unicode_decimal": 58907
+    }
+  ]
+}

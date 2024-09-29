@@ -46,7 +46,8 @@ export const routes = [
 
 const router = new Router({
   mode:'history',
-  base: process.env.BASE_URL,
+  // base: process.env.NODE_ENV === 'production' ? 'http://8.154.36.180:8903' : process.env.NODE_ENV === 'development' ? "http://192.168.10.7:8881":'/api',
+  // base: process.env.BASE_URL,
   routes
 })
 // const createRouter = () => ({
