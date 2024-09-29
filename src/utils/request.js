@@ -6,6 +6,7 @@ import { getToken } from '@/utils/auth'
 
 import {baseURL} from '../../configs/index'
 // 创建axios实例，将来对创建出来的实例，进行自定义配置；；不会污染原始的axios实例
+console.log(process.env.NODE_ENV,'*****');
 const service = axios.create({
   // baseURL: 'http://127.0.0.1:4523/m1/4869431-0-default',
   // baseURL: baseURL,
