@@ -11,7 +11,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/api': {
-        target: 'http://8.154.36.180:8903', // 目标服务器地址
+        target: process.env.BASE_URL, // 目标服务器地址
         changeOrigin: true,
         pathRewrite: {
           '^/api': ''

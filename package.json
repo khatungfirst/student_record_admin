@@ -4,9 +4,9 @@
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev",
-    "build": "set NODE_ENV=production && node build/build.js --mode production",
+    "build": "set NODE_ENV=production&&node build/build.js --mode production",
     "build:pro": "set NODE_ENV=production&&node build/build.js --mode production",
-    "build:dev": "set NODE_ENV=development&& node build/build.js --mode development",
+    "build:dev": "set NODE_ENV=development&&node build/build.js --mode development",
     "build:report": "npm_config_report=true NODE_ENV=production env_config=prod node build/build.js",
     "lint": "eslint --ext .js,.vue src",
     "test": "npm run lint"
