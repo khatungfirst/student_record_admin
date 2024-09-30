@@ -9,7 +9,7 @@ const webpack = require('webpack')
 const config = require('../configs')
 const webpackConfig = require('./webpack.prod.conf')
 const devWbpackConfig = require('./webpack.dev.conf')
-require('dotenv').config();
+
 const spinner = ora(
   'building for ' + process.env.NODE_ENV + ' environment...'
 )
