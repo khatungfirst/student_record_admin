@@ -4,9 +4,9 @@
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev",
-    "build": "set NODE_ENV=production&&node build/build.js --mode production",
-    "build:pro": "set NODE_ENV=production&&node build/build.js --mode production",
-    "build:dev": "set NODE_ENV=development&&node build/build.js --mode development",
+    "build": "cross-env NODE_ENV=production&&node build/build.js --mode production",
+    "build:pro": "cross-env NODE_ENV=production&&node build/build.js --mode production",
+    "build:dev": "cross-env NODE_ENV=development&&node build/build.js --mode development",
     "build:report": "npm_config_report=true NODE_ENV=production env_config=prod node build/build.js",
     "lint": "eslint --ext .js,.vue src",
     "test": "npm run lint"
@@ -46,6 +46,7 @@
     "chalk": "2.4.1",
     "compression-webpack-plugin": "2.0.0",
     "copy-webpack-plugin": "4.5.2",
+    "cross-env": "^7.0.3",
     "css-loader": "1.0.0",
     "eslint": "5.15.2",
     "eslint-friendly-formatter": "4.0.1",

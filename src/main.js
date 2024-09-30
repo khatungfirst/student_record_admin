@@ -11,7 +11,7 @@ import './permission' // permission control
 import './debug' // 错误日志收集
 import '../static/icon/iconfont.css'
 // 在main.js或app.js中  
-
+require('dotenv').config();
 
 Vue.use(ElementUI, {
   size: 'small' // default: medium
