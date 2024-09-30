@@ -12,7 +12,7 @@ require('dotenv').config();
 function resolve(dir) {
   return path.join(__dirname, '..', dir)
 }
-
+console.log("dev-->",process.env)
 const HOST = process.env.HOST
 const PORT = process.env.PORT && Number(process.env.PORT)
 
