@@ -12,7 +12,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 // 引入dotenv模块,用于加载环境变量配置
-//require('dotenv').config();
+require('dotenv').config();
 
 
 //用于生成绝对路径，避免路径书写错误
