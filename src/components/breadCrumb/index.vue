@@ -27,8 +27,6 @@ export default {
   methods: {
     getBreadcrumb() {
       let matched = this.$route.matched.filter(item => item.path)
-      console.log(this.$route.matched,'matched');     
-      console.log('breadcrumb', matched)
       // matched = [{ path: '/desktop', meta: { title: '首页' }}].concat(matched)
       this.levelList = matched
       

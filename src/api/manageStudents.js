@@ -33,7 +33,6 @@ export function exportData(selected_students) {
             body: JSON.stringify({ selected_students: selected_students })
         }
     ).then(response => {
-        console.log(response,'res');
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);

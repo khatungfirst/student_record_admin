@@ -64,7 +64,6 @@ export function banTeacher(username) {
 
 // 获取老师学号
 export function getUsername(data) {
-  // console.log(username,'=============');
   //  const data = {username:username};
   return request({
     url: "/teacherManage/getUsername",

@@ -13,7 +13,6 @@ const service = axios.create({
   // baseURL: process.env.NODE_ENV === 'production' ? 'http://8.154.36.180:8903' :"http://192.168.10.7:8881",
   timeout: 15000
 })
-console.log("---->|||",process.env)
 
 // 添加请求拦截器
 service.interceptors.request.use(config => {
